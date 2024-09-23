@@ -16,9 +16,9 @@ public abstract class Account {
         setBalance(balance);
     }
 
-    public void withdraw(double amount) throws Exception {
+    public void withdraw(double amount) throws ExceptionHandler {
         if (amount > balance) {
-            throw new Exception("Insufficient funds");
+            throw new ExceptionHandler("Insufficient funds");
         }
         balance -= amount;
         System.out.println("Withdrew: " + amount);
