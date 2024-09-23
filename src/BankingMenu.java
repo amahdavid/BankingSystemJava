@@ -44,7 +44,7 @@ public class BankingMenu {
     }
 
     private void createUser() {
-        System.out.println("Create a new user:");
+        System.out.println("---- Create a new user ----");
         System.out.print("Username: ");
         String username = scanner.nextLine();
         System.out.print("Password: ");
