@@ -10,6 +10,7 @@ public class BankingMenu {
     public void displayMenu() {
         int choice;
         do {
+            // might make an if condition to check if a user is an admin and will show them a different menu
             System.out.println("\n--- Banking System Menu ---");
             System.out.println("1. Create User");
             System.out.println("2. Transfer Funds");
@@ -49,8 +50,7 @@ public class BankingMenu {
         String username = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
-        System.out.print("Role (Admin/Customer): ");
-        String role = scanner.nextLine();
+        String role = "Customer";
 
         User newUser = new User(username, password, role);
         boolean isCreated = MyDatabase.createUser(newUser);
@@ -59,10 +59,14 @@ public class BankingMenu {
         } else {
             System.out.println("Failed to create user.");
         }
+
+        System.out.print("Press Enter to return to the main menu...");
+        scanner.nextLine();
     }
 
     private void transferFunds() {
         System.out.println("Transfer Funds functionality is not yet implemented.");
+        // will need the recipient email, will be simulating interac
     }
 
     private void depositFunds() {
@@ -71,5 +75,6 @@ public class BankingMenu {
 
     private void accountManagement() {
         System.out.println("Account Management functionality is not yet implemented.");
+        // will have options to create a savings, chequing, student, and business account
     }
 }
