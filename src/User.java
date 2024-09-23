@@ -1,11 +1,13 @@
+import java.util.UUID;
+
 public class User {
     private String userID;
     private String username;
     private String password;
     private String role;
 
-    public User(String userID, String username, String password, String role) {
-        this.userID = userID;
+    public User(String username, String password, String role) {
+        this.userID = UUID.randomUUID().toString();
         this.username = username;
         this.password = password;
         this.role = role;

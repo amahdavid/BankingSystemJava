@@ -1,11 +1,13 @@
+import java.util.UUID;
+
 public abstract class Account {
     private String accountID;
     private double balance;
     private String accountHolder;
     private String accountType;
 
-    public Account(String accountID, String accountHolder, String accountType) {
-        this.accountID = accountID;
+    public Account(String accountHolder, String accountType) {
+        this.accountID = UUID.randomUUID().toString();
         this.accountHolder = accountHolder;
         this.accountType = accountType;
         this.balance = 0.0;
