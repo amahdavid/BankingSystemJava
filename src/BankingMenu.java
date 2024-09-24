@@ -44,7 +44,7 @@ public class BankingMenu {
 
     private void createUser() {
         System.out.println("---- Create a new user ----");
-        System.out.print("Username: ");
+        System.out.print("Email: ");
         String username = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
@@ -73,14 +73,15 @@ public class BankingMenu {
 
     private void createAccount() {
         System.out.println("\n--- Create New Account ---");
-        System.out.print("Enter Username for Account: ");
-        String username = scanner.nextLine();
+        System.out.print("Enter Email for Account: ");
+        String email = scanner.nextLine();
 
-        User user = MyDatabase.findUser(username);
+        User user = MyDatabase.findUser(email);
         if (user == null) {
             System.out.println("User not found. Please create a user profile first.");
             return;
         }
+        System.out.println("User found: " + user.getEmail() + ", " + user.getUserID());
 
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
@@ -112,7 +113,7 @@ public class BankingMenu {
 
     private void deleteAccount() {
         System.out.println("\n--- Delete Account ---");
-        System.out.print("Enter Username for Account: ");
+        System.out.print("Enter Email for Account: ");
         String username = scanner.nextLine();
 
         User user = MyDatabase.findUser(username);

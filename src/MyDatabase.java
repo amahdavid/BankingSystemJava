@@ -9,7 +9,7 @@ public class MyDatabase {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connection successful!");
+            // System.out.println("Connection successful!");
         } catch (SQLException e) {
             System.out.println("Connection failed: " + e.getMessage());
         }
@@ -17,7 +17,7 @@ public class MyDatabase {
     }
 
     public static boolean createUser(User user) {
-        String sql = "INSERT INTO users (userID, username, password, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getUserID());
@@ -32,28 +32,26 @@ public class MyDatabase {
         }
     }
 
-    public static User findUser(String userIdOrUsername) {
-        User user = null;
-        String query = "SELECT * FROM users WHERE id = ? OR username = ?";
+    public static User findUser(String email) {
+        String query = "SELECT id, email, password, role FROM users WHERE email = ?";
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, userIdOrUsername);
-            stmt.setString(2, userIdOrUsername);
-
+            stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 String id = rs.getString("id");
-                String username = rs.getString("username");
+                String userEmail = rs.getString("email");
+                String password = rs.getString("password");
                 String role = rs.getString("role");
 
-                user = new User(id, username, role);
+                return new User(id, userEmail, password, role);
             }
         } catch (SQLException e) {
             System.out.println("Error finding user: " + e.getMessage());
         }
-        return user;
+        return null;
     }
 
     public static boolean createAccount(String userId, Account account) {
