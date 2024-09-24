@@ -73,8 +73,106 @@ public class BankingMenu {
         System.out.println("Deposit Funds functionality is not yet implemented.");
     }
 
+    private void createAccount() {
+        System.out.println("\n--- Create New Account ---");
+        System.out.print("Enter Username for Account: ");
+        String username = scanner.nextLine();
+
+        // Check if the user exists in the database
+        User user = MyDatabase.findUser(username); // Implement this method to search for a user
+        if (user == null) {
+            System.out.println("User not found. Please create a user profile first.");
+            return;
+        }
+
+        System.out.print("Enter Account Type (Savings/Checking/Business): ");
+        String accountType = scanner.nextLine();
+
+        // Here, instantiate the appropriate Account type based on the accountType
+        Account account = null;
+        switch (accountType.toLowerCase()) {
+            case "savings":
+                account = new SavingsAccount(user.getUserID(), accountType); // Assuming you have a SavingsAccount class
+                break;
+            case "checking":
+                account = new CheckingAccount(user.getUserID(), accountType); // Assuming you have a CheckingAccount class
+                break;
+            case "business":
+                account = new BusinessAccount(user.getUserID(), accountType); // Assuming you have a BusinessAccount class
+                break;
+            default:
+                System.out.println("Invalid account type. Please try again.");
+                return;
+        }
+
+        // Call the createAccount method in MyDatabase with user ID and account object
+        boolean isAccountCreated = MyDatabase.createAccount(user.getUserID(), account);
+
+        if (isAccountCreated) {
+            System.out.println("Account created successfully for " + user.getUsername());
+        } else {
+            System.out.println("Failed to create account. Please try again.");
+        }
+    }
+
+    private void deleteAccount() {
+        System.out.println("\n--- Delete Account ---");
+        System.out.print("Enter Username for Account: ");
+        String username = scanner.nextLine();
+
+        // Check if the user exists in the database
+        User user = MyDatabase.findUser(username); // Implement this method to search for a user
+        if (user == null) {
+            System.out.println("User not found. Please try again.");
+            return;
+        }
+
+        System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
+        String accountType = scanner.nextLine();
+
+        // Retrieve the account ID by user ID and account type
+        String accountId = MyDatabase.getAccountIdByUserAndType(user.getUserID(), accountType);
+
+        if (accountId == null) {
+            System.out.println("Account not found for user: " + user.getUsername());
+            return;
+        }
+
+        // Delete the account using the account ID
+        boolean isAccountDeleted = MyDatabase.deleteAccount(accountId);
+
+        if (isAccountDeleted) {
+            System.out.println("Account deleted successfully for " + user.getUsername());
+        } else {
+            System.out.println("Failed to delete account. Please try again.");
+        }
+    }
+
     private void accountManagement() {
-        System.out.println("Account Management functionality is not yet implemented.");
-        // will have options to create a savings, chequing, student, and business account
+        int choice;
+        do {
+            System.out.println("\n--- Account Management ---");
+            System.out.println("1. Create Account");
+            System.out.println("2. Delete Account");
+            System.out.println("3. Return to Main Menu");
+            System.out.print("Please choose an option: ");
+
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    createAccount();
+                    break;
+                case 2:
+                    deleteAccount();
+                    break;
+                case 3:
+                    System.out.println("Returning to main menu...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 3);
     }
 }

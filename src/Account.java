@@ -3,12 +3,12 @@ import java.util.UUID;
 public abstract class Account {
     private String accountID;
     private double balance;
-    private String accountHolder;
+    private String userID;
     private String accountType;
 
-    public Account(String accountHolder, String accountType) {
+    public Account(String userID, String accountType) {
         this.accountID = UUID.randomUUID().toString();
-        this.accountHolder = accountHolder;
+        this.userID = userID;
         this.accountType = accountType;
         this.balance = 0.0;
     }
@@ -36,11 +36,9 @@ public abstract class Account {
 
     public void setBalance(double balance) {this.balance = balance;}
 
-    public String getAccountHolder() {return accountHolder;}
-
-    public void setAccountHolder(String accountHolder) {this.accountHolder = accountHolder;}
-
     public String getAccountType() {return accountType;}
 
     public void setAccountType(String accountType) {this.accountType = accountType;}
+
+    public String getUserID() {return userID;}
 }
