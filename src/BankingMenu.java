@@ -20,9 +20,10 @@ public class BankingMenu {
                 System.out.println("1. Account Management");
                 System.out.println("2. Transfer Funds");
                 System.out.println("3. Deposit Funds");
-                System.out.println("4. Logout");
+                System.out.println("4. Withdraw Funds");
+                System.out.println("5. Logout");
             }
-            System.out.println("5. Exit");
+            System.out.println("0. Exit");
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
@@ -36,7 +37,7 @@ public class BankingMenu {
                     case 2:
                         createUser();
                         break;
-                    case 5:
+                    case 0:
                         System.out.println("Exiting...");
                         break;
                     default:
@@ -54,20 +55,23 @@ public class BankingMenu {
                         depositFunds();
                         break;
                     case 4:
-                        logout();
+                        withdrawFunds();
                         break;
                     case 5:
+                        logout();
+                        break;
+                    case 0:
                         System.out.println("Exiting...");
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
             }
-        } while (choice != 5);
+        } while (choice != 0);
     }
 
     private void login() {
-        System.out.println("---- Login ----");
+        System.out.println("\n---- Login ----");
         System.out.print("Email: ");
         String email = scanner.nextLine();
         System.out.print("Password: ");
@@ -88,7 +92,7 @@ public class BankingMenu {
     }
 
     private void createUser() {
-        System.out.println("---- Create a new user ----");
+        System.out.println("\n---- Create a new user ----");
         System.out.print("Email: ");
         String username = scanner.nextLine();
         System.out.print("Password: ");
@@ -108,12 +112,16 @@ public class BankingMenu {
     }
 
     private void transferFunds() {
-        System.out.println("Transfer Funds functionality is not yet implemented.");
+        System.out.println("\nTransfer Funds functionality is not yet implemented.");
         // will need the recipient email, will be simulating interac
     }
 
     private void depositFunds() {
-        System.out.println("Deposit Funds functionality is not yet implemented.");
+        System.out.println("\nDeposit Funds functionality is not yet implemented.");
+    }
+
+    private void withdrawFunds() {
+        System.out.println("\nNot implemented yet");
     }
 
     private void createAccount() {
