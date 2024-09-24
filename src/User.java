@@ -2,19 +2,19 @@ import java.util.UUID;
 
 public class User {
     private String userID;
-    private String username;
+    private String email;
     private String password;
     private String role;
 
-    public User(String username, String password, String role) {
+    public User(String email, String password, String role) {
         this.userID = UUID.randomUUID().toString();
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public boolean login (String username, String password) {
-        return this.username.equals(username) && this.password.equals(password);
+    public boolean login (String email, String password) {
+        return this.email.equals(email) && this.password.equals(password);
     }
 
     public String getUserID() {
@@ -25,12 +25,12 @@ public class User {
         this.userID = userID;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String username) {
+        this.email = username;
     }
 
     public String getPassword() {

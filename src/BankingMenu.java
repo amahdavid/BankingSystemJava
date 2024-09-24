@@ -3,9 +3,7 @@ import java.util.Scanner;
 public class BankingMenu {
     private Scanner scanner;
 
-    public BankingMenu() {
-        this.scanner = ScannerSingleton.getInstance(); // Use singleton scanner
-    }
+    public BankingMenu() {this.scanner = ScannerSingleton.getInstance();}
 
     public void displayMenu() {
         int choice;
@@ -20,7 +18,7 @@ public class BankingMenu {
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -78,8 +76,7 @@ public class BankingMenu {
         System.out.print("Enter Username for Account: ");
         String username = scanner.nextLine();
 
-        // Check if the user exists in the database
-        User user = MyDatabase.findUser(username); // Implement this method to search for a user
+        User user = MyDatabase.findUser(username);
         if (user == null) {
             System.out.println("User not found. Please create a user profile first.");
             return;
@@ -88,28 +85,26 @@ public class BankingMenu {
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        // Here, instantiate the appropriate Account type based on the accountType
         Account account = null;
         switch (accountType.toLowerCase()) {
             case "savings":
-                account = new SavingsAccount(user.getUserID(), accountType); // Assuming you have a SavingsAccount class
+                account = new SavingsAccount(user.getUserID(), accountType);
                 break;
             case "checking":
-                account = new CheckingAccount(user.getUserID(), accountType); // Assuming you have a CheckingAccount class
+                account = new CheckingAccount(user.getUserID(), accountType);
                 break;
             case "business":
-                account = new BusinessAccount(user.getUserID(), accountType); // Assuming you have a BusinessAccount class
+                account = new BusinessAccount(user.getUserID(), accountType);
                 break;
             default:
                 System.out.println("Invalid account type. Please try again.");
                 return;
         }
 
-        // Call the createAccount method in MyDatabase with user ID and account object
         boolean isAccountCreated = MyDatabase.createAccount(user.getUserID(), account);
 
         if (isAccountCreated) {
-            System.out.println("Account created successfully for " + user.getUsername());
+            System.out.println("Account created successfully for " + user.getEmail());
         } else {
             System.out.println("Failed to create account. Please try again.");
         }
@@ -120,8 +115,7 @@ public class BankingMenu {
         System.out.print("Enter Username for Account: ");
         String username = scanner.nextLine();
 
-        // Check if the user exists in the database
-        User user = MyDatabase.findUser(username); // Implement this method to search for a user
+        User user = MyDatabase.findUser(username);
         if (user == null) {
             System.out.println("User not found. Please try again.");
             return;
@@ -130,19 +124,17 @@ public class BankingMenu {
         System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        // Retrieve the account ID by user ID and account type
         String accountId = MyDatabase.getAccountIdByUserAndType(user.getUserID(), accountType);
 
         if (accountId == null) {
-            System.out.println("Account not found for user: " + user.getUsername());
+            System.out.println("Account not found for user: " + user.getEmail());
             return;
         }
 
-        // Delete the account using the account ID
         boolean isAccountDeleted = MyDatabase.deleteAccount(accountId);
 
         if (isAccountDeleted) {
-            System.out.println("Account deleted successfully for " + user.getUsername());
+            System.out.println("Account deleted successfully for " + user.getEmail());
         } else {
             System.out.println("Failed to delete account. Please try again.");
         }
@@ -158,7 +150,7 @@ public class BankingMenu {
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:

@@ -21,11 +21,11 @@ public class MyDatabase {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getUserID());
-            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(2, user.getEmail());
             preparedStatement.setString(3, user.getPassword()); // Consider hashing this
             preparedStatement.setString(4, user.getRole());
             int rowsInserted = preparedStatement.executeUpdate();
-            return rowsInserted > 0; // Return true if user was inserted
+            return rowsInserted > 0;
         } catch (SQLException e) {
             System.out.println("Error inserting user: " + e.getMessage());
             return false;
@@ -38,17 +38,15 @@ public class MyDatabase {
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, userIdOrUsername); // Bind user_id
-            stmt.setString(2, userIdOrUsername); // Bind username
+            stmt.setString(1, userIdOrUsername);
+            stmt.setString(2, userIdOrUsername);
 
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // Extract user details
                 String id = rs.getString("id");
                 String username = rs.getString("username");
                 String role = rs.getString("role");
-                // You can expand to retrieve more fields as necessary
 
                 user = new User(id, username, role);
             }
@@ -63,10 +61,10 @@ public class MyDatabase {
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, account.getAccountID());    // Set account UUID
-            stmt.setString(2, userId);                    // Set user UUID (foreign key)
-            stmt.setString(3, account.getAccountType());  // Set account type (Savings, Checking, etc.)
-            stmt.setDouble(4, account.getBalance());      // Set initial balance (usually 0.0)
+            stmt.setString(1, account.getAccountID());
+            stmt.setString(2, userId);
+            stmt.setString(3, account.getAccountType());
+            stmt.setDouble(4, account.getBalance());
 
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
@@ -82,7 +80,7 @@ public class MyDatabase {
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, accountId);  // Set account UUID
+            stmt.setString(1, accountId);
 
             int rowsDeleted = stmt.executeUpdate();
             return rowsDeleted > 0;
@@ -100,13 +98,13 @@ public class MyDatabase {
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, userId);      // Bind user ID
-            stmt.setString(2, accountType); // Bind account type
+            stmt.setString(1, userId);
+            stmt.setString(2, accountType);
 
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                accountId = rs.getString("account_id"); // Get the account ID
+                accountId = rs.getString("account_id");
             }
         } catch (SQLException e) {
             System.out.println("Error retrieving account: " + e.getMessage());
@@ -117,16 +115,14 @@ public class MyDatabase {
 
 
     public static void main(String[] args) {
-    // Check the database connection
-    Connection connection = getConnection();
-    if (connection != null) {
-        // If the connection is successful, close it
-        try {
-            connection.close();
-            System.out.println("Connection closed.");
-        } catch (SQLException e) {
-            System.out.println("Error closing connection: " + e.getMessage());
+        Connection connection = getConnection();
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Connection closed.");
+            } catch (SQLException e) {
+                System.out.println("Error closing connection: " + e.getMessage());
+            }
         }
     }
-}
 }
