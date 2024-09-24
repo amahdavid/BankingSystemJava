@@ -9,7 +9,7 @@ public class BankingMenu {
     public void displayMenu() {
         int choice;
         do {
-            // might make an if condition to check if a user is an admin and will show them a different menu
+            // might add an if condition to check if a user is an admin and will show them a different menu
             System.out.println("\n--- Banking System Menu ---");
             System.out.println("1. Create User");
             System.out.println("2. Transfer Funds");
