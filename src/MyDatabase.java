@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyDatabase {
     private static final String URL = "jdbc:mysql://localhost:3306/BankManagementProject";
@@ -111,6 +113,31 @@ public class MyDatabase {
         return accountId;
     }
 
+    public static List<Account> getAccountsByUserId(String userId) {
+        List<Account> accounts = new ArrayList<>();
+        String query = "SELECT * FROM accounts WHERE user_id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String accountID = rs.getString("account_id");
+                String accountType = rs.getString("account_type");
+
+                // figure out if you want a default value or let the user decide
+                double balance = rs.getDouble("balance");
+
+                Account account = new Account(accountID, balance, userId, accountType);
+                accounts.add(account);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving accounts: " + e.getMessage());
+        }
+        return accounts;
+    }
 
     public static void main(String[] args) {
         Connection connection = getConnection();

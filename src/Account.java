@@ -1,6 +1,6 @@
 import java.util.UUID;
 
-public abstract class Account {
+public class Account {
     private String accountID;
     private double balance;
     private String userID;
@@ -13,11 +13,20 @@ public abstract class Account {
         this.balance = 0.0;
     }
 
+    public Account(String accountID, double balance, String userID, String accountType) {
+        this.accountID = accountID;
+        this.balance = balance;
+        this.userID = userID;
+        this.accountType = accountType;
+    }
+
+    // figure out what you want to do with this function
     public void deposit(double amount) {
         balance += amount;
         setBalance(balance);
     }
 
+    // figure out what you want to do with this function
     public void withdraw(double amount) throws ExceptionHandler {
         if (amount > balance) {
             throw new ExceptionHandler("Insufficient funds");
@@ -26,7 +35,8 @@ public abstract class Account {
         System.out.println("Withdrew: " + amount);
     }
 
-    public abstract void transfer(Account recipient, double amount) throws Exception;
+    // figure out what you want to do with this function
+    public void transfer(Account recipient, double amount) throws Exception {}
 
     public String getAccountID() {return accountID;}
 

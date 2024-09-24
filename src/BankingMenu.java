@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class BankingMenu {
@@ -81,12 +82,11 @@ public class BankingMenu {
             System.out.println("User not found. Please create a user profile first.");
             return;
         }
-        System.out.println("User found: " + user.getEmail() + ", " + user.getUserID());
 
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        Account account = null;
+        Account account;
         switch (accountType.toLowerCase()) {
             case "savings":
                 account = new SavingsAccount(user.getUserID(), accountType);
@@ -141,13 +141,36 @@ public class BankingMenu {
         }
     }
 
+    private void displayAccounts() {
+        System.out.println("\n--- Display All Accounts ---");
+        System.out.print("Enter Email for Account: ");
+        String email = scanner.nextLine();
+
+        User user = MyDatabase.findUser(email);
+        if (user == null) {
+            System.out.println("User not found. Please try again.");
+            return;
+        }
+
+        List<Account> accounts = MyDatabase.getAccountsByUserId(user.getUserID());
+        if (accounts.isEmpty()) {
+            System.out.println("No accounts found for user: " + email);
+        } else {
+            System.out.println("Accounts for user " + email + ":");
+            for (Account account : accounts) {
+                System.out.println("Account ID: " + account.getAccountID() + ", Type: " + account.getAccountType() + ", Balance: " + account.getBalance());
+            }
+        }
+    }
+
     private void accountManagement() {
         int choice;
         do {
             System.out.println("\n--- Account Management ---");
             System.out.println("1. Create Account");
             System.out.println("2. Delete Account");
-            System.out.println("3. Return to Main Menu");
+            System.out.println("3. Display All Accounts");
+            System.out.println("4. Return to Main Menu");
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
@@ -161,11 +184,14 @@ public class BankingMenu {
                     deleteAccount();
                     break;
                 case 3:
+                    displayAccounts();
+                    break;
+                case 4:
                     System.out.println("Returning to main menu...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (choice != 3);
+        } while (choice != 4);
     }
 }
