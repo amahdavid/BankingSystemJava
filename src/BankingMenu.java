@@ -3,44 +3,88 @@ import java.util.Scanner;
 
 public class BankingMenu {
     private Scanner scanner;
+    private User loggedInUser = null;
 
-    public BankingMenu() {this.scanner = ScannerSingleton.getInstance();}
+    public BankingMenu() {
+        this.scanner = ScannerSingleton.getInstance();
+    }
 
     public void displayMenu() {
         int choice;
         do {
-            // might add an if condition to check if a user is an admin and will show them a different menu
             System.out.println("\n--- Banking System Menu ---");
-            System.out.println("1. Create User");
-            System.out.println("2. Transfer Funds");
-            System.out.println("3. Deposit Funds");
-            System.out.println("4. Account Management");
+            if (loggedInUser == null) {
+                System.out.println("1. Login");
+                System.out.println("2. Create User");
+            } else {
+                System.out.println("1. Account Management");
+                System.out.println("2. Transfer Funds");
+                System.out.println("3. Deposit Funds");
+                System.out.println("4. Logout");
+            }
             System.out.println("5. Exit");
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
             scanner.nextLine();
 
-            switch (choice) {
-                case 1:
-                    createUser();
-                    break;
-                case 2:
-                    transferFunds();
-                    break;
-                case 3:
-                    depositFunds();
-                    break;
-                case 4:
-                    accountManagement();
-                    break;
-                case 5:
-                    System.out.println("Exiting...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            if (loggedInUser == null) {
+                switch (choice) {
+                    case 1:
+                        login();
+                        break;
+                    case 2:
+                        createUser();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            } else {
+                switch (choice) {
+                    case 1:
+                        accountManagement();
+                        break;
+                    case 2:
+                        transferFunds();
+                        break;
+                    case 3:
+                        depositFunds();
+                        break;
+                    case 4:
+                        logout();
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
             }
         } while (choice != 5);
+    }
+
+    private void login() {
+        System.out.println("---- Login ----");
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        User user = MyDatabase.findUser(email);
+        if (user != null && user.login(email, password)) {
+            loggedInUser = user;
+            System.out.println("Login successful. Welcome, " + loggedInUser.getEmail());
+        } else {
+            System.out.println("Invalid email or password.");
+        }
+    }
+
+    private void logout() {
+        System.out.println("Logging out...");
+        loggedInUser = null;
     }
 
     private void createUser() {
@@ -74,38 +118,29 @@ public class BankingMenu {
 
     private void createAccount() {
         System.out.println("\n--- Create New Account ---");
-        System.out.print("Enter Email for Account: ");
-        String email = scanner.nextLine();
-
-        User user = MyDatabase.findUser(email);
-        if (user == null) {
-            System.out.println("User not found. Please create a user profile first.");
-            return;
-        }
-
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
         Account account;
         switch (accountType.toLowerCase()) {
             case "savings":
-                account = new SavingsAccount(user.getUserID(), accountType);
+                account = new SavingsAccount(loggedInUser.getUserID(), accountType);
                 break;
             case "checking":
-                account = new CheckingAccount(user.getUserID(), accountType);
+                account = new CheckingAccount(loggedInUser.getUserID(), accountType);
                 break;
             case "business":
-                account = new BusinessAccount(user.getUserID(), accountType);
+                account = new BusinessAccount(loggedInUser.getUserID(), accountType);
                 break;
             default:
                 System.out.println("Invalid account type. Please try again.");
                 return;
         }
 
-        boolean isAccountCreated = MyDatabase.createAccount(user.getUserID(), account);
+        boolean isAccountCreated = MyDatabase.createAccount(loggedInUser.getUserID(), account);
 
         if (isAccountCreated) {
-            System.out.println("Account created successfully for " + user.getEmail());
+            System.out.println("Account created successfully for " + loggedInUser.getEmail());
         } else {
             System.out.println("Failed to create account. Please try again.");
         }
@@ -113,29 +148,20 @@ public class BankingMenu {
 
     private void deleteAccount() {
         System.out.println("\n--- Delete Account ---");
-        System.out.print("Enter Email for Account: ");
-        String username = scanner.nextLine();
-
-        User user = MyDatabase.findUser(username);
-        if (user == null) {
-            System.out.println("User not found. Please try again.");
-            return;
-        }
-
         System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        String accountId = MyDatabase.getAccountIdByUserAndType(user.getUserID(), accountType);
+        String accountId = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
 
         if (accountId == null) {
-            System.out.println("Account not found for user: " + user.getEmail());
+            System.out.println("Account not found for user: " + loggedInUser.getEmail());
             return;
         }
 
         boolean isAccountDeleted = MyDatabase.deleteAccount(accountId);
 
         if (isAccountDeleted) {
-            System.out.println("Account deleted successfully for " + user.getEmail());
+            System.out.println("Account deleted successfully for " + loggedInUser.getEmail());
         } else {
             System.out.println("Failed to delete account. Please try again.");
         }
@@ -143,28 +169,25 @@ public class BankingMenu {
 
     private void displayAccounts() {
         System.out.println("\n--- Display All Accounts ---");
-        System.out.print("Enter Email for Account: ");
-        String email = scanner.nextLine();
-
-        User user = MyDatabase.findUser(email);
-        if (user == null) {
-            System.out.println("User not found. Please try again.");
-            return;
-        }
-
-        List<Account> accounts = MyDatabase.getAccountsByUserId(user.getUserID());
+        List<Account> accounts = MyDatabase.getAccountsByUserId(loggedInUser.getUserID());
         if (accounts.isEmpty()) {
-            System.out.println("No accounts found for user: " + email);
+            System.out.println("No accounts found for user: " + loggedInUser.getEmail());
         } else {
-            System.out.println("Accounts for user " + email + ":");
+            System.out.println("Accounts for user " + loggedInUser.getEmail() + ":");
             for (Account account : accounts) {
-                System.out.println("Account ID: " + account.getAccountID() + ", Type: " + account.getAccountType() + ", Balance: " + account.getBalance());
+                System.out.println("Account ID: " + account.getAccountID() + ", Type: "
+                        + account.getAccountType() + ", Balance: " + account.getBalance());
             }
         }
     }
 
     private void accountManagement() {
+        if (loggedInUser == null) {
+            System.out.println("Please log in first.");
+            return;
+        }
         int choice;
+
         do {
             System.out.println("\n--- Account Management ---");
             System.out.println("1. Create Account");
