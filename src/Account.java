@@ -20,13 +20,14 @@ public class Account {
         this.accountType = accountType;
     }
 
-    // figure out what you want to do with this function
-    public void deposit(double amount) {
+    public void deposit(double amount) throws ExceptionHandler {
+        if (amount <= 0) {
+            throw new ExceptionHandler("Deposit amount must be greater than zero.");
+        }
         balance += amount;
-        setBalance(balance);
+        System.out.println("Deposited: " + amount);
     }
 
-    // figure out what you want to do with this function
     public void withdraw(double amount) throws ExceptionHandler {
         if (amount > balance) {
             throw new ExceptionHandler("Insufficient funds");
@@ -35,8 +36,14 @@ public class Account {
         System.out.println("Withdrew: " + amount);
     }
 
-    // figure out what you want to do with this function
-    public void transfer(Account recipient, double amount) throws Exception {}
+    public void transfer(Account recipient, double amount) throws ExceptionHandler {
+        if (amount > this.balance) {
+            throw new ExceptionHandler("Insufficient funds to complete the transfer.");
+        }
+        this.withdraw(amount);  // Withdraw from sender
+        recipient.deposit(amount);  // Deposit into recipient
+        System.out.println("Transferred " + amount + " to " + recipient.getAccountID());
+    }
 
     public String getAccountID() {return accountID;}
 

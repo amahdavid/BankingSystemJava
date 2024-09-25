@@ -9,7 +9,7 @@ public class BankingMenu {
         this.scanner = ScannerSingleton.getInstance();
     }
 
-    public void displayMenu() {
+    public void displayMenu() throws ExceptionHandler {
         int choice;
         do {
             System.out.println("\n--- Banking System Menu ---");
@@ -112,16 +112,95 @@ public class BankingMenu {
     }
 
     private void transferFunds() {
-        System.out.println("\nTransfer Funds functionality is not yet implemented.");
-        // will need the recipient email, will be simulating interac
+        if (loggedInUser == null){
+            System.out.println("Please log in first");
+            return;
+        }
+
+        System.out.println("\n---- Transfer Funds ----");
+        System.out.println("Enter recipient's email: ");
+        String recipientEmail = scanner.nextLine();
+
+        User recipient = MyDatabase.findUser(recipientEmail);
+        if (recipient == null){
+            System.out.println("Recipient not found");
+            return;
+        }
+
+        System.out.println("Enter amount to transfer: ");
+        double amount = scanner.nextDouble();
+        scanner.nextLine();
+
+        Account senderAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), "Checking");
+        Account recipientAccount = MyDatabase.getAccountIdByUserAndType(recipient.getUserID(), "Checking");
+
+        if (senderAccount == null || recipientAccount == null) {
+            System.out.println("Account not found.");
+            return;
+        }
+
+        try {
+            senderAccount.transfer(recipientAccount, amount);
+            MyDatabase.updateAccountBalance(senderAccount.getAccountID(), senderAccount.getBalance());
+            MyDatabase.updateAccountBalance(recipientAccount.getAccountID(), recipientAccount.getBalance());
+
+            System.out.println("Transfer of " + amount + " to " + recipientEmail + " successful!");
+        } catch (ExceptionHandler e) {
+            System.out.println("Transfer failed: " + e.getMessage());
+        }
     }
 
-    private void depositFunds() {
-        System.out.println("\nDeposit Funds functionality is not yet implemented.");
+    private void depositFunds() throws ExceptionHandler {
+        if (loggedInUser == null) {
+            System.out.println("Please log in first.");
+            return;
+        }
+
+        System.out.println("\n---- Deposit Funds ----");
+        System.out.println("Enter amount to deposit: ");
+        double amount = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.println("Enter account to deposit to: ");
+        String accountType = scanner.nextLine();
+
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(),  accountType);
+        if (userAccount == null) {
+            System.out.println("Account not found.");
+            return;
+        }
+        userAccount.deposit(amount);
+        MyDatabase.updateAccountBalance(userAccount.getAccountID(), userAccount.getBalance());
+        System.out.println("Deposited " + amount + " successfully!");
     }
 
     private void withdrawFunds() {
-        System.out.println("\nNot implemented yet");
+        if (loggedInUser == null) {
+            System.out.println("Please log in first.");
+            return;
+        }
+
+        System.out.println("\n---- Withdraw Funds ----");
+        System.out.println("Enter amount to withdraw: ");
+        double amount = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.println("Enter account to withdraw from: ");
+        String accountType = scanner.nextLine();
+
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
+        if (userAccount == null) {
+            System.out.println("Account not found.");
+            return;
+        }
+
+        try {
+            userAccount.withdraw(amount);
+            MyDatabase.updateAccountBalance(userAccount.getAccountID(), userAccount.getBalance());
+            System.out.println("Withdrew " + amount + " successfully!");
+        } catch (ExceptionHandler e) {
+            System.out.println("Withdrawal failed: " + e.getMessage());
+        }
     }
 
     private void createAccount() {
@@ -159,14 +238,14 @@ public class BankingMenu {
         System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        String accountId = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
+        Account accountToBeDeleted = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
 
-        if (accountId == null) {
+        if (accountToBeDeleted == null) {
             System.out.println("Account not found for user: " + loggedInUser.getEmail());
             return;
         }
 
-        boolean isAccountDeleted = MyDatabase.deleteAccount(accountId);
+        boolean isAccountDeleted = MyDatabase.deleteAccount(accountToBeDeleted.getAccountID());
 
         if (isAccountDeleted) {
             System.out.println("Account deleted successfully for " + loggedInUser.getEmail());

@@ -18,7 +18,7 @@ public class MyDatabase {
     }
 
     public static boolean createUser(User user) {
-        String sql = "INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (id, email, password, role) VALUES (?, ?, ?, ?)";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getUserID());
@@ -78,38 +78,38 @@ public class MyDatabase {
         String query = "DELETE FROM accounts WHERE account_id = ?";
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
-
             stmt.setString(1, accountId);
-
             int rowsDeleted = stmt.executeUpdate();
             return rowsDeleted > 0;
-
         } catch (SQLException e) {
             System.out.println("Error deleting account: " + e.getMessage());
         }
         return false;
     }
 
-    public static String getAccountIdByUserAndType(String userId, String accountType) {
-        String accountId = null;
-        String query = "SELECT account_id FROM accounts WHERE user_id = ? AND account_type = ?";
+    public static Account getAccountIdByUserAndType(String userId, String accountType) {
+        String query = "SELECT account_id, balance, user_id, account_type FROM accounts WHERE user_id = ? AND account_type = ?";
 
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
             stmt.setString(1, userId);
             stmt.setString(2, accountType);
-
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                accountId = rs.getString("account_id");
+                String accountId = rs.getString("account_id");
+                String userID = rs.getString("user_id");
+                String accType = rs.getString("account_type");
+                double balance = rs.getDouble("balance");
+
+                return new Account(accountId, balance, userID, accType);
             }
         } catch (SQLException e) {
             System.out.println("Error retrieving account: " + e.getMessage());
         }
 
-        return accountId;
+        return null;
     }
 
     public static List<Account> getAccountsByUserId(String userId) {
@@ -137,6 +137,19 @@ public class MyDatabase {
         }
         return accounts;
     }
+
+    public static void updateAccountBalance(String accountID, double newBalance) {
+        String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setDouble(1, newBalance);
+            stmt.setString(2, accountID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating account balance: " + e.getMessage());
+        }
+    }
+
 
     public static void main(String[] args) {
         Connection connection = getConnection();
