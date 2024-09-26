@@ -1,5 +1,6 @@
 package main.java.com.banksystem;
 
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,7 +14,7 @@ public class BankingMenu {
 
     // NEED TO IMPLEMENT TRANSACTION HISTORY
     public void displayMenu() throws ExceptionHandler {
-        int choice;
+        int choice = -1;
         do {
             System.out.println("\n--- Banking System Menu ---");
             if (loggedInUser == null) {
@@ -28,8 +29,14 @@ public class BankingMenu {
             }
             System.out.println("0. Exit");
             System.out.print("Please choose an option: ");
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+            } catch (InputMismatchException e) {
+                System.out.println("InputMismatchException: " + e.getMessage());
+                scanner.nextLine(); // Clear the invalid input
+                continue; // Skip to the next iteration of the loop
+            }
 
             if (loggedInUser == null) {
                 switch (choice) {

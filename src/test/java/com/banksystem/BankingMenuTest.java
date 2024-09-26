@@ -45,7 +45,7 @@ public class BankingMenuTest {
     public void testLogin_ValidCredentials() throws ExceptionHandler {
 
         // Simulate user input for login
-        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
+        String simulatedInput = "1" + testEmail + testPassword + "0";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
         bankingMenu.displayMenu();
