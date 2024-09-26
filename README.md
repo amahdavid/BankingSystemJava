@@ -5,15 +5,15 @@ The Banking System project is a simple banking application
 designed to simulate the key functionalities of a modern banking system.
 It allows users to manage different types of accounts,
 perform transactions like deposits, withdrawals, and fund transfers,
-and maintain user roles like main.java.com.banksystem.Admin and Customer for appropriate access control.
+and maintain user roles like Admin and Customer for appropriate access control.
 The project is built using Core Java, with optional database integration for persistence,
 showcasing Object-Oriented Programming (OOP) principles, error handling, and data management.
 
 ## Features:
-- **main.java.com.banksystem.Account Types**: Savings, Checking, Business Accounts.
+- **Account Types**: Savings, Checking, Business Accounts.
 - **Transactions**: Deposits, withdrawals, fund transfers.
-- **main.java.com.banksystem.User Roles**: main.java.com.banksystem.Admin (for managing accounts), Customer (for performing transactions).
-- **main.java.com.banksystem.Transaction History**: Record of all transactions per user.
+- **User Roles**: Admin (for managing accounts), Customer (for performing transactions).
+- **Transaction History**: Record of all transactions per user.
   
 ## Technologies:
 - **Core Java**: Classes for accounts, users, transactions.
@@ -26,10 +26,10 @@ showcasing Object-Oriented Programming (OOP) principles, error handling, and dat
 
 ## Object-Oriented Design:
 - **Classes**: Separation of concerns using different classes for users, accounts, and transactions.
-    - **_User_**: Represents a system user, either an main.java.com.banksystem.Admin or Customer. 
+    - **_User_**: Represents a system user, either an Admin or Customer. 
     - **_Account_**: Represents different types of accounts (Savings, Checking, Business) with unique balances. 
     - **_Transaction_**: Tracks deposits, withdrawals, and transfers between accounts.
-- **Inheritance**: Different account types inherit from a base main.java.com.banksystem.Account class, using specific methods like deposit() and withdraw().
+- **Inheritance**: Different account types inherit from a base Account class, using specific methods like deposit() and withdraw().
 - **Encapsulation**:
 Sensitive data (e.g., passwords, balances) are kept private and accessed through public methods.
 
