@@ -4,49 +4,70 @@ import main.java.com.banksystem.BankingMenu;
 import main.java.com.banksystem.ExceptionHandler;
 import main.java.com.banksystem.MyDatabase;
 import main.java.com.banksystem.ScannerSingleton;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BankingMenuTest {
     private BankingMenu bankingMenu;
-    private Connection connection;
-
+    private TestUtils testUtils;
     private String testUserId = UUID.randomUUID().toString();
     private String testEmail = "testuser@example.com";
-    private String testPassword = "password123"; // Consider using plain text only for testing
+    private String testPassword = "password123";
     private String testRole = "Customer";
 
     @Before
     public void initialization() throws Exception {
         Scanner scanner = ScannerSingleton.getInstance();
+        Connection connection = MyDatabase.getConnection();
         bankingMenu = new BankingMenu(scanner);
-        connection = MyDatabase.getConnection();
-        cleanupDatabase();
-        insertTestUser();
+        testUtils = new TestUtils(connection);
+        testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
     }
 
     @After
     public void tearDown() throws Exception {
-        // Clean up database after each test
-        cleanupDatabase();
-        connection.close();
+        testUtils.cleanupDatabase();
+    }
+
+    @Test
+    public void testLogin_InvalidCredentials() throws ExceptionHandler {
+        String invalidUser = "invalid@gmail.com";
+        String simulatedInput = "1\n" + invalidUser + "\n" + testPassword + "\n0\n";
+
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        String expectedOutput = "No account found with the email: " + invalidUser + ". Please create an account";
+
+        assertTrue(outContent.toString().contains(expectedOutput));
+        assertNull(bankingMenu.getLoggedInUser());
+
+        System.setIn(System.in);
+        System.setOut(originalOut);
     }
 
     @Test
     public void testLogin_ValidCredentials() throws ExceptionHandler {
-        // Simulate user input for login
         String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
@@ -58,31 +79,5 @@ public class BankingMenuTest {
         assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
 
         System.setIn(new ByteArrayInputStream(new byte[0]));
-    }
-
-    private void insertTestUser() throws Exception {
-        String sql = "INSERT INTO users (id, email, password, role) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, testUserId);
-            preparedStatement.setString(2, testEmail);
-            preparedStatement.setString(3, testPassword); // This should ideally be hashed in production
-            preparedStatement.setString(4, testRole);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error inserting test user: " + e.getMessage());
-        }
-    }
-
-    private void cleanupDatabase() throws Exception {
-        String cleanupUsersSQL = "DELETE FROM users";
-        String cleanupTransactionsSQL = "DELETE FROM transactions";
-        String cleanupAccountsSQL = "DELETE FROM accounts";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(cleanupAccountsSQL);
-            stmt.executeUpdate(cleanupTransactionsSQL);
-            stmt.executeUpdate(cleanupUsersSQL);
-        } catch (SQLException e) {
-            System.out.println("Error cleaning up database: " + e.getMessage());
-        }
     }
 }

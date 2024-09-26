@@ -103,7 +103,7 @@ public class BankingMenu {
         return loggedInUser;
     }
 
-    private void login() { // FUNCTIONAL
+    private void login() {
         System.out.println("\n---- Login ----");
         System.out.print("Email: ");
         String email = scanner.nextLine();
@@ -111,11 +111,14 @@ public class BankingMenu {
         String password = scanner.nextLine();
 
         User user = MyDatabase.findUser(email.toLowerCase());
-        if (user != null && user.login(email.toLowerCase(), password)) {
+
+        if (user == null) {
+            System.out.println("No account found with the email: " + email + ". Please create an account.");
+        } else if (!user.login(email.toLowerCase(), password)) {
+            System.out.println("Incorrect password. Please try again.");
+        } else {
             loggedInUser = user;
             System.out.println("Login successful. Welcome, " + loggedInUser.getEmail());
-        } else {
-            System.out.println("Invalid email or password.");
         }
     }
 

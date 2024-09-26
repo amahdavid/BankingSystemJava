@@ -19,7 +19,7 @@ public class BusinessAccount extends Account {
             throw new ExceptionHandler("Insufficient funds including transaction fee.");
         }
         super.withdraw(totalAmount);
-        System.out.println("main.java.com.banksystem.Transaction fee applied: " + TRANSACTION_FEE);
+        System.out.println("Transaction fee applied: " + TRANSACTION_FEE);
     }
 
 }
