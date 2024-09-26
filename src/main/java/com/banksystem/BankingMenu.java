@@ -15,69 +15,88 @@ public class BankingMenu {
     // NEED TO IMPLEMENT TRANSACTION HISTORY
     // ALSO NEED TO DECOUPLE THIS MENU
     public void displayMenu() throws ExceptionHandler {
-        int choice = -1;
+        int choice;
         do {
             System.out.println("\n--- Banking System Menu ---");
-            if (loggedInUser == null) {
-                System.out.println("1. Login");
-                System.out.println("2. Create User");
-            } else {
-                System.out.println("1. Account Management");
-                System.out.println("2. Transfer Funds");
-                System.out.println("3. Deposit Funds");
-                System.out.println("4. Withdraw Funds");
-                System.out.println("5. Logout");
-            }
-            System.out.println("0. Exit");
+            printMenuOptions();
             System.out.print("Please choose an option: ");
-            try {
-                choice = scanner.nextInt();
-                scanner.nextLine();
-            } catch (InputMismatchException e) {
-                System.out.println("InputMismatchException: " + e.getMessage());
-                scanner.nextLine();
-                continue;
-            }
+
+            choice = getUserChoice();
 
             if (loggedInUser == null) {
-                switch (choice) {
-                    case 1:
-                        login();
-                        break;
-                    case 2:
-                        createUser();
-                        break;
-                    case 0:
-                        System.out.println("Exiting...");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
+                handleGuestMenuChoice(choice);
             } else {
-                switch (choice) {
-                    case 1:
-                        accountManagement();
-                        break;
-                    case 2:
-                        transferFunds();
-                        break;
-                    case 3:
-                        depositFunds();
-                        break;
-                    case 4:
-                        withdrawFunds();
-                        break;
-                    case 5:
-                        logout();
-                        break;
-                    case 0:
-                        System.out.println("Exiting...");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
+                handleUserMenuChoice(choice);
             }
+
         } while (choice != 0);
+    }
+
+    private void printMenuOptions() {
+        if (loggedInUser == null) {
+            System.out.println("1. Login");
+            System.out.println("2. Create User");
+        } else {
+            System.out.println("1. Account Management");
+            System.out.println("2. Transfer Funds");
+            System.out.println("3. Deposit Funds");
+            System.out.println("4. Withdraw Funds");
+            System.out.println("5. Logout");
+        }
+        System.out.println("0. Exit");
+    }
+
+    private int getUserChoice() {
+        int choice = -1;
+        try {
+            choice = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("InputMismatchException: " + e.getMessage());
+            scanner.nextLine();
+        }
+        return choice;
+    }
+
+    private void handleGuestMenuChoice(int choice) {
+        switch (choice) {
+            case 1:
+                login();
+                break;
+            case 2:
+                createUser();
+                break;
+            case 0:
+                System.out.println("Exiting...");
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+        }
+    }
+
+    private void handleUserMenuChoice(int choice) throws ExceptionHandler {
+        switch (choice) {
+            case 1:
+                accountManagement();
+                break;
+            case 2:
+                transferFunds();
+                break;
+            case 3:
+                depositFunds();
+                break;
+            case 4:
+                withdrawFunds();
+                break;
+            case 5:
+                logout();
+                break;
+            case 0:
+                System.out.println("Exiting...");
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+        }
     }
 
     public User getLoggedInUser() {
