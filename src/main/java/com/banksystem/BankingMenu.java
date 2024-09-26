@@ -1,7 +1,5 @@
 package main.java.com.banksystem;
 
-import main.java.com.banksystem.Account;
-
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,9 +18,9 @@ public class BankingMenu {
             System.out.println("\n--- Banking System Menu ---");
             if (loggedInUser == null) {
                 System.out.println("1. Login");
-                System.out.println("2. Create main.java.com.banksystem.User");
+                System.out.println("2. Create User");
             } else {
-                System.out.println("1. main.java.com.banksystem.Account Management");
+                System.out.println("1. Account Management");
                 System.out.println("2. Transfer Funds");
                 System.out.println("3. Deposit Funds");
                 System.out.println("4. Withdraw Funds");
@@ -30,7 +28,6 @@ public class BankingMenu {
             }
             System.out.println("0. Exit");
             System.out.print("Please choose an option: ");
-
             choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -75,6 +72,10 @@ public class BankingMenu {
         } while (choice != 0);
     }
 
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
     private void login() { // FUNCTIONAL
         System.out.println("\n---- Login ----");
         System.out.print("Email: ");
@@ -107,7 +108,7 @@ public class BankingMenu {
         User newUser = new User(username, password, role);
         boolean isCreated = MyDatabase.createUser(newUser);
         if (isCreated) {
-            System.out.println("main.java.com.banksystem.User created successfully!");
+            System.out.println("User created successfully!");
         } else {
             System.out.println("Failed to create user.");
         }
@@ -140,7 +141,7 @@ public class BankingMenu {
         Account recipientAccount = MyDatabase.getAccountIdByUserAndType(recipient.getUserID(), "Checking");
 
         if (senderAccount == null || recipientAccount == null) {
-            System.out.println("main.java.com.banksystem.Account not found.");
+            System.out.println("Account not found.");
             return;
         }
 
@@ -170,7 +171,7 @@ public class BankingMenu {
 
         Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(),  accountType);
         if (userAccount == null) {
-            System.out.println("main.java.com.banksystem.Account not found.");
+            System.out.println("Account not found.");
             return;
         }
         userAccount.deposit(amount);
@@ -194,7 +195,7 @@ public class BankingMenu {
 
         Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
         if (userAccount == null) {
-            System.out.println("main.java.com.banksystem.Account not found.");
+            System.out.println("Account not found.");
             return;
         }
 
@@ -208,8 +209,8 @@ public class BankingMenu {
     }
 
     private void createAccount() { // FUNCTIONAL
-        System.out.println("\n--- Create New main.java.com.banksystem.Account ---");
-        System.out.print("Enter main.java.com.banksystem.Account Type (Savings/Checking/Business): ");
+        System.out.println("\n--- Create New Account ---");
+        System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
         Account account;
@@ -231,28 +232,28 @@ public class BankingMenu {
         boolean isAccountCreated = MyDatabase.createAccount(loggedInUser.getUserID(), account);
 
         if (isAccountCreated) {
-            System.out.println("main.java.com.banksystem.Account created successfully for " + loggedInUser.getEmail());
+            System.out.println("Account created successfully for " + loggedInUser.getEmail());
         } else {
             System.out.println("Failed to create account. Please try again.");
         }
     }
 
     private void deleteAccount() { // FUNCTIONAL
-        System.out.println("\n--- Delete main.java.com.banksystem.Account ---");
-        System.out.print("Enter main.java.com.banksystem.Account Type to Delete (Savings/Checking/Business): ");
+        System.out.println("\n--- Delete Account ---");
+        System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
         Account accountToBeDeleted = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
 
         if (accountToBeDeleted == null) {
-            System.out.println("main.java.com.banksystem.Account not found for user: " + loggedInUser.getEmail());
+            System.out.println("Account not found for user: " + loggedInUser.getEmail());
             return;
         }
 
         boolean isAccountDeleted = MyDatabase.deleteAccount(accountToBeDeleted.getAccountID());
 
         if (isAccountDeleted) {
-            System.out.println("main.java.com.banksystem.Account deleted successfully for " + loggedInUser.getEmail());
+            System.out.println("Account deleted successfully for " + loggedInUser.getEmail());
         } else {
             System.out.println("Failed to delete account. Please try again.");
         }
@@ -266,7 +267,7 @@ public class BankingMenu {
         } else {
             System.out.println("Accounts for user " + loggedInUser.getEmail() + ":");
             for (Account account : accounts) {
-                System.out.println("main.java.com.banksystem.Account ID: " + account.getAccountID() + ", Type: "
+                System.out.println("Account ID: " + account.getAccountID() + ", Type: "
                         + account.getAccountType() + ", Balance: " + account.getBalance());
             }
         }
@@ -280,11 +281,11 @@ public class BankingMenu {
         int choice;
 
         do {
-            System.out.println("\n--- main.java.com.banksystem.Account Management ---");
-            System.out.println("1. Create main.java.com.banksystem.Account");
-            System.out.println("2. Delete main.java.com.banksystem.Account");
+            System.out.println("\n--- Account Management ---");
+            System.out.println("1. Create Account");
+            System.out.println("2. Delete Account");
             System.out.println("3. Display All Accounts");
-            System.out.println("4. Return to main.java.com.banksystem.Main Menu");
+            System.out.println("4. Return Main Menu");
             System.out.print("Please choose an option: ");
 
             choice = scanner.nextInt();
