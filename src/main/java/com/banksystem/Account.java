@@ -1,3 +1,5 @@
+package main.java.com.banksystem;
+
 import java.util.UUID;
 
 public class Account {

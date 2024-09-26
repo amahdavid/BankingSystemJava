@@ -1,3 +1,7 @@
+package main.java.com.banksystem;
+
+import main.java.com.banksystem.Account;
+
 public class CheckingAccount extends Account {
     private static final double OVERDRAFT_LIMIT = 500.00;
 

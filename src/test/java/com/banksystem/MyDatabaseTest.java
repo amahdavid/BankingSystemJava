@@ -1,4 +1,4 @@
-package UnitTests;
+package test.java.com.banksystem;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,10 @@
+package main.java.com.banksystem;
+
 public class Admin extends User {
 
     // NOT IMPLEMENTED YET
     public Admin(String username, String password) {
-        super(username, password, "Admin");
+        super(username, password, "main.java.com.banksystem.Admin");
     }
 
     public void createAccount() {
