@@ -1,5 +1,6 @@
 public class Admin extends User {
 
+    // NOT IMPLEMENTED YET
     public Admin(String username, String password) {
         super(username, password, "Admin");
     }
@@ -11,6 +12,4 @@ public class Admin extends User {
     public void deleteAccount() {
         // will implement with SQL DB
     }
-
-    // other admin functionalities
 }

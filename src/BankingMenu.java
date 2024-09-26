@@ -9,6 +9,7 @@ public class BankingMenu {
         this.scanner = ScannerSingleton.getInstance();
     }
 
+    // NEED TO IMPLEMENT TRANSACTION HISTORY
     public void displayMenu() throws ExceptionHandler {
         int choice;
         do {
