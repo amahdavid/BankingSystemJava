@@ -8,11 +8,12 @@ public class BankingMenu {
     private Scanner scanner;
     private User loggedInUser = null;
 
-    public BankingMenu() {
-        this.scanner = ScannerSingleton.getInstance();
+    public BankingMenu(Scanner scanner) {
+        this.scanner = scanner;
     }
 
     // NEED TO IMPLEMENT TRANSACTION HISTORY
+    // ALSO NEED TO DECOUPLE THIS MENU
     public void displayMenu() throws ExceptionHandler {
         int choice = -1;
         do {
@@ -31,11 +32,11 @@ public class BankingMenu {
             System.out.print("Please choose an option: ");
             try {
                 choice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
+                scanner.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("InputMismatchException: " + e.getMessage());
-                scanner.nextLine(); // Clear the invalid input
-                continue; // Skip to the next iteration of the loop
+                scanner.nextLine();
+                continue;
             }
 
             if (loggedInUser == null) {

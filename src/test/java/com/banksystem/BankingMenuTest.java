@@ -3,6 +3,7 @@ package test.java.com.banksystem;
 import main.java.com.banksystem.BankingMenu;
 import main.java.com.banksystem.ExceptionHandler;
 import main.java.com.banksystem.MyDatabase;
+import main.java.com.banksystem.ScannerSingleton;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +30,8 @@ public class BankingMenuTest {
 
     @Before
     public void initialization() throws Exception {
-        bankingMenu = new BankingMenu();
+        Scanner scanner = ScannerSingleton.getInstance();
+        bankingMenu = new BankingMenu(scanner);
         connection = MyDatabase.getConnection();
         cleanupDatabase();
         insertTestUser();
@@ -43,13 +46,18 @@ public class BankingMenuTest {
 
     @Test
     public void testLogin_ValidCredentials() throws ExceptionHandler {
-
         // Simulate user input for login
-        String simulatedInput = "1" + testEmail + testPassword + "0";
+        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
         bankingMenu.displayMenu();
+
         assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
+
+        System.setIn(new ByteArrayInputStream(new byte[0]));
     }
 
     private void insertTestUser() throws Exception {
