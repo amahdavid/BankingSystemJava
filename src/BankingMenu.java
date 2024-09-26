@@ -70,15 +70,15 @@ public class BankingMenu {
         } while (choice != 0);
     }
 
-    private void login() {
+    private void login() { // FUNCTIONAL
         System.out.println("\n---- Login ----");
         System.out.print("Email: ");
         String email = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        User user = MyDatabase.findUser(email);
-        if (user != null && user.login(email, password)) {
+        User user = MyDatabase.findUser(email.toLowerCase());
+        if (user != null && user.login(email.toLowerCase(), password)) {
             loggedInUser = user;
             System.out.println("Login successful. Welcome, " + loggedInUser.getEmail());
         } else {
@@ -86,12 +86,12 @@ public class BankingMenu {
         }
     }
 
-    private void logout() {
+    private void logout() { // FUNCTIONAL
         System.out.println("Logging out...");
         loggedInUser = null;
     }
 
-    private void createUser() {
+    private void createUser() { // FUNCTIONAL
         System.out.println("\n---- Create a new user ----");
         System.out.print("Email: ");
         String username = scanner.nextLine();
@@ -111,23 +111,23 @@ public class BankingMenu {
         scanner.nextLine();
     }
 
-    private void transferFunds() {
+    private void transferFunds() { // FUNCTIONAL
         if (loggedInUser == null){
             System.out.println("Please log in first");
             return;
         }
 
         System.out.println("\n---- Transfer Funds ----");
-        System.out.println("Enter recipient's email: ");
+        System.out.print("Enter recipient's email: ");
         String recipientEmail = scanner.nextLine();
 
-        User recipient = MyDatabase.findUser(recipientEmail);
+        User recipient = MyDatabase.findUser(recipientEmail.toLowerCase());
         if (recipient == null){
             System.out.println("Recipient not found");
             return;
         }
 
-        System.out.println("Enter amount to transfer: ");
+        System.out.print("Enter amount to transfer: ");
         double amount = scanner.nextDouble();
         scanner.nextLine();
 
@@ -143,25 +143,24 @@ public class BankingMenu {
             senderAccount.transfer(recipientAccount, amount);
             MyDatabase.updateAccountBalance(senderAccount.getAccountID(), senderAccount.getBalance());
             MyDatabase.updateAccountBalance(recipientAccount.getAccountID(), recipientAccount.getBalance());
-
             System.out.println("Transfer of " + amount + " to " + recipientEmail + " successful!");
         } catch (ExceptionHandler e) {
             System.out.println("Transfer failed: " + e.getMessage());
         }
     }
 
-    private void depositFunds() throws ExceptionHandler {
+    private void depositFunds() throws ExceptionHandler { // FUNCTIONAL
         if (loggedInUser == null) {
             System.out.println("Please log in first.");
             return;
         }
 
         System.out.println("\n---- Deposit Funds ----");
-        System.out.println("Enter amount to deposit: ");
+        System.out.print("Enter amount to deposit: ");
         double amount = scanner.nextDouble();
         scanner.nextLine();
 
-        System.out.println("Enter account to deposit to: ");
+        System.out.print("Enter account to deposit to: ");
         String accountType = scanner.nextLine();
 
         Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(),  accountType);
@@ -174,18 +173,18 @@ public class BankingMenu {
         System.out.println("Deposited " + amount + " successfully!");
     }
 
-    private void withdrawFunds() {
+    private void withdrawFunds() { // FUNCTIONAL
         if (loggedInUser == null) {
             System.out.println("Please log in first.");
             return;
         }
 
         System.out.println("\n---- Withdraw Funds ----");
-        System.out.println("Enter amount to withdraw: ");
+        System.out.print("Enter amount to withdraw: ");
         double amount = scanner.nextDouble();
         scanner.nextLine();
 
-        System.out.println("Enter account to withdraw from: ");
+        System.out.print("Enter account to withdraw from: ");
         String accountType = scanner.nextLine();
 
         Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
@@ -203,7 +202,7 @@ public class BankingMenu {
         }
     }
 
-    private void createAccount() {
+    private void createAccount() { // FUNCTIONAL
         System.out.println("\n--- Create New Account ---");
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
@@ -233,7 +232,7 @@ public class BankingMenu {
         }
     }
 
-    private void deleteAccount() {
+    private void deleteAccount() { // FUNCTIONAL
         System.out.println("\n--- Delete Account ---");
         System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
@@ -254,7 +253,7 @@ public class BankingMenu {
         }
     }
 
-    private void displayAccounts() {
+    private void displayAccounts() { // FUNCTIONAL
         System.out.println("\n--- Display All Accounts ---");
         List<Account> accounts = MyDatabase.getAccountsByUserId(loggedInUser.getUserID());
         if (accounts.isEmpty()) {

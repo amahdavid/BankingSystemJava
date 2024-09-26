@@ -25,7 +25,6 @@ public class Account {
             throw new ExceptionHandler("Deposit amount must be greater than zero.");
         }
         balance += amount;
-        System.out.println("Deposited: " + amount);
     }
 
     public void withdraw(double amount) throws ExceptionHandler {
@@ -33,16 +32,14 @@ public class Account {
             throw new ExceptionHandler("Insufficient funds");
         }
         balance -= amount;
-        System.out.println("Withdrew: " + amount);
     }
 
     public void transfer(Account recipient, double amount) throws ExceptionHandler {
         if (amount > this.balance) {
             throw new ExceptionHandler("Insufficient funds to complete the transfer.");
         }
-        this.withdraw(amount);  // Withdraw from sender
-        recipient.deposit(amount);  // Deposit into recipient
-        System.out.println("Transferred " + amount + " to " + recipient.getAccountID());
+        this.withdraw(amount);
+        recipient.deposit(amount);
     }
 
     public String getAccountID() {return accountID;}
