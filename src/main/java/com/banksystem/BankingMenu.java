@@ -135,6 +135,12 @@ public class BankingMenu {
         String password = scanner.nextLine();
         String role = "Customer";
 
+        // Check for valid input
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            System.out.println("Failed to create user. Email and password cannot be empty.");
+            return;
+        }
+
         User newUser = new User(username, password, role);
         boolean isCreated = MyDatabase.createUser(newUser);
         if (isCreated) {

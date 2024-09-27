@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -28,21 +29,22 @@ public class BankingMenuTest {
     private final String testRole = "Customer";
 
     @Before
-    public void initialization() throws Exception
-    {
+    public void initialization() throws Exception {
         Scanner scanner = ScannerSingleton.getInstance();
         Connection connection = MyDatabase.getConnection();
         bankingMenu = new BankingMenu(scanner);
         testUtils = new TestUtils(connection);
-        testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
+        testUtils.cleanupDatabase();
     }
 
     @After
-    public void tearDown() throws Exception {testUtils.cleanupDatabase();}
+    public void tearDown() throws Exception {
+        testUtils.cleanupDatabase();
+    }
 
     @Test
-    public void testLogin_ValidCredentials() throws ExceptionHandler
-    {
+    public void testLogin_ValidCredentials() throws ExceptionHandler, SQLException {
+        testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
         String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
@@ -52,13 +54,11 @@ public class BankingMenuTest {
         bankingMenu.displayMenu();
 
         assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
-
         System.setIn(new ByteArrayInputStream(new byte[0]));
     }
 
     @Test
-    public void testLogin_InvalidCredentials() throws ExceptionHandler
-    {
+    public void testLogin_InvalidCredentials() throws ExceptionHandler {
         String invalidUser = "invalid@gmail.com";
         String simulatedInput = "1\n" + invalidUser + "\n" + testPassword + "\n0\n";
 
@@ -83,7 +83,38 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testCreateUser_ValidCredentials() {
+    public void testCreateUser_ValidCredentials() throws ExceptionHandler {
+        String simulatedInput = "2\n" + testEmail + "\n" + testPassword + "\n\n" +"1\n" + testEmail + "\n" + testPassword + "\n0\n";
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
+        System.setIn(new ByteArrayInputStream(new byte[0]));
+    }
+
+    @Test
+    public void testCreateUser_InvalidCredentials() throws ExceptionHandler {
+        String simulatedInput = "2\n\n\n0\n";
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        String output = outputStream.toString();
+        assertTrue("The output should indicate failure due to empty credentials.",
+                output.contains("Failed to create user. Email and password cannot be empty."));
+        System.setIn(new ByteArrayInputStream(new byte[0]));
+        System.setOut(originalOut);
 
     }
 }
