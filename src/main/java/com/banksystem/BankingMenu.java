@@ -259,7 +259,7 @@ public class BankingMenu {
                 return;
         }
 
-        boolean isAccountCreated = MyDatabase.createAccount(loggedInUser.getUserID(), account);
+        boolean isAccountCreated = MyDatabase.createAccount(loggedInUser, account);
 
         if (isAccountCreated) {
             System.out.println("Account created successfully for " + loggedInUser.getEmail());

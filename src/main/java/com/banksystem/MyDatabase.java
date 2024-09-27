@@ -57,13 +57,17 @@ public class MyDatabase {
         return null;
     }
 
-    public static boolean createAccount(String userId, Account account) {
+    public static boolean createAccount(User user, Account account) {
+        if (findUser(user.getEmail()) == null) {
+            System.out.println("User does not exist");
+            return false;
+        }
         String query = "INSERT INTO accounts (account_id, user_id, account_type, balance) VALUES (?, ?, ?, ?)";
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
             stmt.setString(1, account.getAccountID());
-            stmt.setString(2, userId);
+            stmt.setString(2, user.getUserID());
             stmt.setString(3, account.getAccountType());
             stmt.setDouble(4, account.getBalance());
 
@@ -110,7 +114,6 @@ public class MyDatabase {
         } catch (SQLException e) {
             System.out.println("Error retrieving account: " + e.getMessage());
         }
-
         return null;
     }
 
