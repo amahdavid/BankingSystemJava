@@ -135,7 +135,6 @@ public class BankingMenu {
         String password = scanner.nextLine();
         String role = "Customer";
 
-        // Check for valid input
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             System.out.println("Failed to create user. Email and password cannot be empty.");
             return;
@@ -151,6 +150,37 @@ public class BankingMenu {
 
         System.out.print("Press Enter to return to the main menu...");
         scanner.nextLine();
+    }
+
+    private void createAccount() { // FUNCTIONAL
+        System.out.println("\n--- Create New Account ---");
+        System.out.print("Enter Account Type (Savings/Checking/Business): ");
+        String accountType = scanner.nextLine();
+        System.out.print("Enter how much to deposit: ");
+        double balance = scanner.nextDouble();
+
+        Account account;
+        switch (accountType.toLowerCase()) {
+            case "savings":
+                account = new SavingsAccount(loggedInUser.getUserID(), accountType, balance);
+                break;
+            case "checking":
+                account = new CheckingAccount(loggedInUser.getUserID(), accountType, balance);
+                break;
+            case "business":
+                account = new BusinessAccount(loggedInUser.getUserID(), accountType, balance);
+                break;
+            default:
+                System.out.println("Invalid account type. Please try again.");
+                return;
+        }
+        boolean isAccountCreated = MyDatabase.createAccount(loggedInUser, account);
+
+        if (isAccountCreated) {
+            System.out.println("Account created successfully for " + loggedInUser.getEmail());
+        } else {
+            System.out.println("Failed to create account. Please try again.");
+        }
     }
 
     private void transferFunds() { // FUNCTIONAL
@@ -240,38 +270,6 @@ public class BankingMenu {
             System.out.println("Withdrew " + amount + " successfully!");
         } catch (ExceptionHandler e) {
             System.out.println("Withdrawal failed: " + e.getMessage());
-        }
-    }
-
-    private void createAccount() { // FUNCTIONAL
-        System.out.println("\n--- Create New Account ---");
-        System.out.print("Enter Account Type (Savings/Checking/Business): ");
-        String accountType = scanner.nextLine();
-        System.out.print("Enter how much to deposit: ");
-        double balance = scanner.nextDouble();
-
-        Account account;
-        switch (accountType.toLowerCase()) {
-            case "savings":
-                account = new SavingsAccount(loggedInUser.getUserID(), accountType, balance);
-                break;
-            case "checking":
-                account = new CheckingAccount(loggedInUser.getUserID(), accountType, balance);
-                break;
-            case "business":
-                account = new BusinessAccount(loggedInUser.getUserID(), accountType, balance);
-                break;
-            default:
-                System.out.println("Invalid account type. Please try again.");
-                return;
-        }
-
-        boolean isAccountCreated = MyDatabase.createAccount(loggedInUser, account);
-
-        if (isAccountCreated) {
-            System.out.println("Account created successfully for " + loggedInUser.getEmail());
-        } else {
-            System.out.println("Failed to create account. Please try again.");
         }
     }
 

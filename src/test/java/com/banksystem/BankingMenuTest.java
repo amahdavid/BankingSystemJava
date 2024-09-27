@@ -1,9 +1,6 @@
 package test.java.com.banksystem;
 
-import main.java.com.banksystem.BankingMenu;
-import main.java.com.banksystem.ExceptionHandler;
-import main.java.com.banksystem.MyDatabase;
-import main.java.com.banksystem.ScannerSingleton;
+import main.java.com.banksystem.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +24,9 @@ public class BankingMenuTest {
     private final String testEmail = "testuser@example.com";
     private final String testPassword = "password123";
     private final String testRole = "Customer";
+    private final String testAccountId = UUID.randomUUID().toString();
+    private final String testAccountType = "Savings";
+    private final double testAccountBalance = 100.89;
 
     @Before
     public void initialization() throws Exception {
@@ -43,7 +43,7 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testLogin_ValidCredentials() throws ExceptionHandler, SQLException {
+    public void testLogin_ValidCredentials_Success() throws ExceptionHandler, SQLException {
         testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
         String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
@@ -58,7 +58,7 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testLogin_InvalidCredentials() throws ExceptionHandler {
+    public void testLogin_InvalidCredentials_Exception() throws ExceptionHandler {
         String invalidUser = "invalid@gmail.com";
         String simulatedInput = "1\n" + invalidUser + "\n" + testPassword + "\n0\n";
 
@@ -83,8 +83,8 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testCreateUser_ValidCredentials() throws ExceptionHandler {
-        String simulatedInput = "2\n" + testEmail + "\n" + testPassword + "\n\n" +"1\n" + testEmail + "\n" + testPassword + "\n0\n";
+    public void testCreateUser_ValidCredentials_Success() throws ExceptionHandler {
+        String simulatedInput = "2\n" + testEmail + "\n" + testPassword + "\n\n" + "1\n" + testEmail + "\n" + testPassword + "\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
 
@@ -97,7 +97,7 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testCreateUser_InvalidCredentials() throws ExceptionHandler {
+    public void testCreateUser_InvalidCredentials_Exception() throws ExceptionHandler {
         String simulatedInput = "2\n\n\n0\n";
         InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
         System.setIn(in);
@@ -115,6 +115,52 @@ public class BankingMenuTest {
                 output.contains("Failed to create user. Email and password cannot be empty."));
         System.setIn(new ByteArrayInputStream(new byte[0]));
         System.setOut(originalOut);
+    }
 
+    @Test
+    public void testCreateAccount_ValidData_Success() throws SQLException, ExceptionHandler {
+        testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
+        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n" + // Login step
+                "1\n" + // Account Management
+                "1\n" + // Create Account
+                testAccountType + "\n" + // Account Type (using provided variable)
+                testAccountBalance + "\n" + // Deposit Amount (using provided variable)
+                "4\n" + // Return to Main Menu
+                "0\n"; // Exit
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        Account createdAccount = MyDatabase.getAccountIdByUserAndType(bankingMenu.getLoggedInUser(), testAccountType);
+        assertNotNull(createdAccount);
+        double delta = 0.01;
+        assertEquals(testAccountBalance, createdAccount.getBalance(), delta);
+        System.setIn(new ByteArrayInputStream(new byte[0]));
+    }
+
+    @Test
+    public void testCreateAccount_InvalidData_Exception() throws ExceptionHandler, SQLException {
+        testUtils.insertTestUser(testUserId, testEmail, testPassword, testRole);
+        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n" + // Login step
+                "1\n" + // Account Management
+                "1\n" + // Create Account
+                "null\n" + // Invalid Account Type (simulate null)
+                "0.0\n" + // Invalid Balance (simulate 0.0, assuming this is treated as invalid)
+                "4\n" + // Return to Main Menu
+                "0\n"; // Exit
+
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        Account createdAccount = MyDatabase.getAccountIdByUserAndType(bankingMenu.getLoggedInUser(), "null");
+        assertNull(createdAccount);
+        System.setIn(new ByteArrayInputStream(new byte[0]));
     }
 }
