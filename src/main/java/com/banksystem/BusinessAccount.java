@@ -5,8 +5,8 @@ import main.java.com.banksystem.Account;
 public class BusinessAccount extends Account {
     private static final double TRANSACTION_FEE = 2.50;
 
-    public BusinessAccount(String userID, String accountType) {
-        super(userID, accountType);
+    public BusinessAccount(String userID, String accountType, double balance) {
+        super(userID, accountType, balance);
     }
     public BusinessAccount(String accountID, double balance, String userID) {
         super(accountID, balance, userID, "Business");

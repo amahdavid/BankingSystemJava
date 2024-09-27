@@ -8,11 +8,11 @@ public class Account {
     private String userID;
     private String accountType;
 
-    public Account(String userID, String accountType) {
+    public Account(String userID, String accountType, double balance) {
         this.accountID = UUID.randomUUID().toString();
         this.userID = userID;
         this.accountType = accountType;
-        this.balance = 0.0;
+        this.balance = balance;
     }
 
     public Account(String accountID, double balance, String userID, String accountType) {

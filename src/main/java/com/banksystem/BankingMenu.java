@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BankingMenu {
-    private Scanner scanner;
+    private final Scanner scanner;
     private User loggedInUser = null;
 
     public BankingMenu(Scanner scanner) {
@@ -167,18 +167,17 @@ public class BankingMenu {
         double amount = scanner.nextDouble();
         scanner.nextLine();
 
-        Account senderAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), "Checking");
-        Account recipientAccount = MyDatabase.getAccountIdByUserAndType(recipient.getUserID(), "Checking");
+        Account senderAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser, "Checking");
+        Account recipientAccount = MyDatabase.getAccountIdByUserAndType(recipient, "Checking");
 
         if (senderAccount == null || recipientAccount == null) {
             System.out.println("Account not found.");
             return;
         }
-
         try {
             senderAccount.transfer(recipientAccount, amount);
-            MyDatabase.updateAccountBalance(senderAccount.getAccountID(), senderAccount.getBalance());
-            MyDatabase.updateAccountBalance(recipientAccount.getAccountID(), recipientAccount.getBalance());
+            MyDatabase.updateAccountBalance(senderAccount, senderAccount.getBalance());
+            MyDatabase.updateAccountBalance(recipientAccount, recipientAccount.getBalance());
             System.out.println("Transfer of " + amount + " to " + recipientEmail + " successful!");
         } catch (ExceptionHandler e) {
             System.out.println("Transfer failed: " + e.getMessage());
@@ -199,13 +198,13 @@ public class BankingMenu {
         System.out.print("Enter account to deposit to: ");
         String accountType = scanner.nextLine();
 
-        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(),  accountType);
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser,  accountType);
         if (userAccount == null) {
             System.out.println("Account not found.");
             return;
         }
         userAccount.deposit(amount);
-        MyDatabase.updateAccountBalance(userAccount.getAccountID(), userAccount.getBalance());
+        MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
         System.out.println("Deposited " + amount + " successfully!");
     }
 
@@ -223,7 +222,7 @@ public class BankingMenu {
         System.out.print("Enter account to withdraw from: ");
         String accountType = scanner.nextLine();
 
-        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser, accountType);
         if (userAccount == null) {
             System.out.println("Account not found.");
             return;
@@ -231,7 +230,7 @@ public class BankingMenu {
 
         try {
             userAccount.withdraw(amount);
-            MyDatabase.updateAccountBalance(userAccount.getAccountID(), userAccount.getBalance());
+            MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
             System.out.println("Withdrew " + amount + " successfully!");
         } catch (ExceptionHandler e) {
             System.out.println("Withdrawal failed: " + e.getMessage());
@@ -242,17 +241,19 @@ public class BankingMenu {
         System.out.println("\n--- Create New Account ---");
         System.out.print("Enter Account Type (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
+        System.out.print("Enter how much to deposit: ");
+        double balance = scanner.nextDouble();
 
         Account account;
         switch (accountType.toLowerCase()) {
             case "savings":
-                account = new SavingsAccount(loggedInUser.getUserID(), accountType);
+                account = new SavingsAccount(loggedInUser.getUserID(), accountType, balance);
                 break;
             case "checking":
-                account = new CheckingAccount(loggedInUser.getUserID(), accountType);
+                account = new CheckingAccount(loggedInUser.getUserID(), accountType, balance);
                 break;
             case "business":
-                account = new BusinessAccount(loggedInUser.getUserID(), accountType);
+                account = new BusinessAccount(loggedInUser.getUserID(), accountType, balance);
                 break;
             default:
                 System.out.println("Invalid account type. Please try again.");
@@ -273,7 +274,7 @@ public class BankingMenu {
         System.out.print("Enter Account Type to Delete (Savings/Checking/Business): ");
         String accountType = scanner.nextLine();
 
-        Account accountToBeDeleted = MyDatabase.getAccountIdByUserAndType(loggedInUser.getUserID(), accountType);
+        Account accountToBeDeleted = MyDatabase.getAccountIdByUserAndType(loggedInUser, accountType);
 
         if (accountToBeDeleted == null) {
             System.out.println("Account not found for user: " + loggedInUser.getEmail());

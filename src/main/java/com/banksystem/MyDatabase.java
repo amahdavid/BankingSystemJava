@@ -93,13 +93,13 @@ public class MyDatabase {
         return false;
     }
 
-    public static Account getAccountIdByUserAndType(String userId, String accountType) {
+    public static Account getAccountIdByUserAndType(User user, String accountType) {
         String query = "SELECT account_id, balance, user_id, account_type FROM accounts WHERE user_id = ? AND account_type = ?";
 
         try (Connection connection = MyDatabase.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, userId);
+            stmt.setString(1, user.getUserID());
             stmt.setString(2, accountType);
             ResultSet rs = stmt.executeQuery();
 
@@ -117,24 +117,21 @@ public class MyDatabase {
         return null;
     }
 
-    public static List<Account> getAccountsByUserId(String userId) {
+    public static List<Account> getAccountsByUserId(String userID) {
         List<Account> accounts = new ArrayList<>();
         String query = "SELECT * FROM accounts WHERE user_id = ?";
 
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, userId);
+            stmt.setString(1, userID);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 String accountID = rs.getString("account_id");
                 String accountType = rs.getString("account_type");
-
-                // figure out if you want a default value or let the user decide
                 double balance = rs.getDouble("balance");
-
-                Account account = new Account(accountID, balance, userId, accountType);
+                Account account = new Account(accountID, balance, userID, accountType);
                 accounts.add(account);
             }
         } catch (SQLException e) {
@@ -143,12 +140,13 @@ public class MyDatabase {
         return accounts;
     }
 
-    public static void updateAccountBalance(String accountID, double newBalance) {
+    public static void updateAccountBalance(Account account, double newBalance) {
         String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setDouble(1, newBalance);
-            stmt.setString(2, accountID);
+            account.setBalance(newBalance);
+            stmt.setDouble(1, account.getBalance());
+            stmt.setString(2, account.getAccountID());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating account balance: " + e.getMessage());

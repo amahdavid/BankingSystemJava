@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,13 +18,13 @@ class MyDatabaseTest {
 
     // Set up a test user and database connection details
     private User validUser;
-    private Account validAccount;
+    private Account validSavingsAccount;
     private TestUtils testUtils;
 
     @BeforeEach
     void setUp() throws SQLException {
         validUser = new User(UUID.randomUUID().toString(), "test@example.com", "password123", "Customer");
-        validAccount = new Account(validUser.getUserID(), "Savings");
+        validSavingsAccount = new Account(validUser.getUserID(), "Savings", 100.0);
         Connection connection = MyDatabase.getConnection();
         testUtils = new TestUtils(connection);
         testUtils.cleanupDatabase();
@@ -75,20 +76,20 @@ class MyDatabaseTest {
     void createAccount_ValidData_Success()
     {
         MyDatabase.createUser(validUser);
-        boolean result = MyDatabase.createAccount(validUser, validAccount);
+        boolean result = MyDatabase.createAccount(validUser, validSavingsAccount);
         assertTrue(result, "Account should be created successfully");
-        Account foundAccount = MyDatabase.getAccountIdByUserAndType(validUser.getUserID(), validAccount.getAccountType());
+        Account foundAccount = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
         assertNotNull(foundAccount, "Account should be found in the database");
-        assertEquals(validAccount.getAccountID(), foundAccount.getAccountID(), "Account ID should match");
-        assertEquals(validAccount.getAccountType(), foundAccount.getAccountType(), "Account type should match");
-        assertEquals(validAccount.getBalance(), foundAccount.getBalance(), "Balance should match");
+        assertEquals(validSavingsAccount.getAccountID(), foundAccount.getAccountID(), "Account ID should match");
+        assertEquals(validSavingsAccount.getAccountType(), foundAccount.getAccountType(), "Account type should match");
+        assertEquals(validSavingsAccount.getBalance(), foundAccount.getBalance(), "Balance should match");
     }
 
     @Test
     void createAccount_InvalidData_Exception()
     {
         MyDatabase.createUser(validUser);
-        Account invalidAccount = new Account(null, null);
+        Account invalidAccount = new Account(null, null, 0);
         boolean result = MyDatabase.createAccount(validUser, invalidAccount);
         assertFalse(result, "Account creation should fail with invalid data");
     }
@@ -97,16 +98,16 @@ class MyDatabaseTest {
     void deleteAccount_ValidData_Success()
     {
         MyDatabase.createUser(validUser);
-        boolean createResult = MyDatabase.createAccount(validUser, validAccount);
+        boolean createResult = MyDatabase.createAccount(validUser, validSavingsAccount);
         assertTrue(createResult, "Account should be created successfully");
-        Account foundAccount = MyDatabase.getAccountIdByUserAndType(validUser.getUserID(), validAccount.getAccountType());
+        Account foundAccount = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
         assertNotNull(foundAccount, "Account should be found in the database");
-        assertEquals(validAccount.getAccountID(), foundAccount.getAccountID(), "Account ID should match");
-        assertEquals(validAccount.getAccountType(), foundAccount.getAccountType(), "Account type should match");
-        assertEquals(validAccount.getBalance(), foundAccount.getBalance(), "Balance should match");
+        assertEquals(validSavingsAccount.getAccountID(), foundAccount.getAccountID(), "Account ID should match");
+        assertEquals(validSavingsAccount.getAccountType(), foundAccount.getAccountType(), "Account type should match");
+        assertEquals(validSavingsAccount.getBalance(), foundAccount.getBalance(), "Balance should match");
 
-        boolean deleteResult = MyDatabase.deleteAccount(validAccount.getAccountID());
-        Account deletedAccount = MyDatabase.getAccountIdByUserAndType(validUser.getUserID(), validAccount.getAccountType());
+        boolean deleteResult = MyDatabase.deleteAccount(validSavingsAccount.getAccountID());
+        Account deletedAccount = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
         assertTrue(deleteResult, "Account is deleted");
         assertNull(deletedAccount, "Account does not exist in DB");
     }
@@ -121,45 +122,77 @@ class MyDatabaseTest {
     void getAccountIdByUserAndType_ValidUserAndType_Success()
     {
         MyDatabase.createUser(validUser);
-        MyDatabase.createAccount(validUser, validAccount);
+        MyDatabase.createAccount(validUser, validSavingsAccount);
 
-        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(validUser.getUserID(), validAccount.getAccountType());
+        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
 
         assertNotNull(retrievedAccount, "Account should be found in the database");
-        assertEquals(validAccount.getAccountID(), retrievedAccount.getAccountID(), "Account ID should match");
-        assertEquals(validAccount.getAccountType(), retrievedAccount.getAccountType(), "Account type should match");
-        assertEquals(validAccount.getBalance(), retrievedAccount.getBalance(), "Balance should match");
+        assertEquals(validSavingsAccount.getAccountID(), retrievedAccount.getAccountID(), "Account ID should match");
+        assertEquals(validSavingsAccount.getAccountType(), retrievedAccount.getAccountType(), "Account type should match");
+        assertEquals(validSavingsAccount.getBalance(), retrievedAccount.getBalance(), "Balance should match");
         assertEquals(validUser.getUserID(), retrievedAccount.getUserID(), "User ID should match");
     }
     @Test
     void getAccountIdByUserAndType_ValidUserAndInvalidType_Exception()
     {
         MyDatabase.createUser(validUser);
-        MyDatabase.createAccount(validUser, validAccount);
-        String invalidAccountType = "invalid_type";
-        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(validUser.getUserID(), invalidAccountType);
+        MyDatabase.createAccount(validUser, validSavingsAccount);
+        Account invalidAccount = new Account(validUser.getUserID(), null, 0);
+        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(validUser, invalidAccount.getAccountType());
         assertNull(retrievedAccount, "No account should be found for the invalid account type");
     }
 
     @Test
     void getAccountIdByUserAndType_InvalidUserAndValidType_Exception()
     {
-        String invalidUserId = "invalid_user";
+        User invalidUser = new User("testUserIdInvalid", null, "password123", "Customer");
         MyDatabase.createUser(validUser);
-        MyDatabase.createAccount(validUser, validAccount);
-        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(invalidUserId, validAccount.getAccountType());
+        MyDatabase.createAccount(validUser, validSavingsAccount);
+        Account retrievedAccount = MyDatabase.getAccountIdByUserAndType(invalidUser, validSavingsAccount.getAccountType());
         assertNull(retrievedAccount, "No account should be found for the invalid user ID");
     }
 
     @Test
-    void getAccountsByUserId_ValidUserID_Success() {
+    void getAccountsByUserId_ValidUserID_Success()
+    {
+        MyDatabase.createUser(validUser);
+        MyDatabase.createAccount(validUser, validSavingsAccount);
+
+        List<Account> accounts = MyDatabase.getAccountsByUserId(validUser.getUserID());
+        assertNotNull(accounts, "The account list should not be null");
+        assertEquals(1, accounts.size(), "There should be 3 accounts associated with the user");
+
+        assertEquals(validSavingsAccount.getAccountID(), accounts.getFirst().getAccountID(), "Account ID should match for the first account");
+        assertEquals(validSavingsAccount.getAccountType(), accounts.getFirst().getAccountType(), "Account type should match for the first account");
+        assertEquals(validSavingsAccount.getBalance(), accounts.getFirst().getBalance(), "Balance should match for the first account");
     }
 
     @Test
-    void getAccountsByUserId_InvalidUserID_Exception() {
+    void getAccountsByUserId_InvalidUserID_Exception()
+    {
+        User invalidUser = new User("testUserIdInvalid", null, "password123", "Customer");
+        List<Account> accounts = MyDatabase.getAccountsByUserId(invalidUser.getUserID());
+        assertNotNull(accounts, "The account list should not be null, but should be empty");
+        assertEquals(0, accounts.size(), "No accounts should be returned for an invalid user ID");
     }
 
     @Test
-    void updateAccountBalance() {
+    void updateAccountBalance_ValidAccount_Success()
+    {
+        MyDatabase.createUser(validUser);
+        MyDatabase.createAccount(validUser, validSavingsAccount);
+        double newBalance = 150.0;
+        MyDatabase.updateAccountBalance(validSavingsAccount, newBalance);
+        Account updatedAccount = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
+    }
+
+    @Test
+    void updateAccountBalance_InvalidAccount_Exception()
+    {
+        Account invalidAccount = new Account(null, null, 0);
+        double newBalance = 150.0;
+        MyDatabase.updateAccountBalance(invalidAccount, newBalance);
+        Account account = MyDatabase.getAccountIdByUserAndType(validUser, validSavingsAccount.getAccountType());
+        assertNull(account, "Account should not exist, and no update should have occurred");
     }
 }

@@ -6,8 +6,8 @@ import main.java.com.banksystem.ExceptionHandler;
 public class SavingsAccount extends Account {
     private static final double MINIMUM_BALANCE = 100.00;
 
-    public SavingsAccount(String userID, String accountType) {
-        super(userID, accountType);
+    public SavingsAccount(String userID, String accountType, double balance) {
+        super(userID, accountType, balance);
     }
 
     public SavingsAccount(String accountID, double balance, String userID) {
