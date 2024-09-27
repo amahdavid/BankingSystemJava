@@ -16,14 +16,13 @@ public class User {
     }
 
     public User(String userID, String email, String password, String role) {
-        this.userID = userID;  // Use the existing UUID from the database
+        this.userID = userID;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    // figure out what you want to do with this function
-    public boolean login (String email, String password) {
+    public boolean login(String email, String password) {
         return this.email.equals(email) && this.password.equals(password);
     }
 

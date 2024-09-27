@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MyDatabaseTest {
 
-    // Set up a test user and database connection details
     private User validUser;
     private Account validSavingsAccount;
     private TestUtils testUtils;

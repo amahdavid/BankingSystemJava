@@ -8,6 +8,7 @@ public class BusinessAccount extends Account {
     public BusinessAccount(String userID, String accountType, double balance) {
         super(userID, accountType, balance);
     }
+
     public BusinessAccount(String accountID, double balance, String userID) {
         super(accountID, balance, userID, "Business");
     }

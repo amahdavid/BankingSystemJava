@@ -148,7 +148,7 @@ public class BankingMenu {
     }
 
     private void transferFunds() { // FUNCTIONAL
-        if (loggedInUser == null){
+        if (loggedInUser == null) {
             System.out.println("Please log in first");
             return;
         }
@@ -158,7 +158,7 @@ public class BankingMenu {
         String recipientEmail = scanner.nextLine();
 
         User recipient = MyDatabase.findUser(recipientEmail.toLowerCase());
-        if (recipient == null){
+        if (recipient == null) {
             System.out.println("Recipient not found");
             return;
         }
@@ -198,7 +198,7 @@ public class BankingMenu {
         System.out.print("Enter account to deposit to: ");
         String accountType = scanner.nextLine();
 
-        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser,  accountType);
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser, accountType);
         if (userAccount == null) {
             System.out.println("Account not found.");
             return;

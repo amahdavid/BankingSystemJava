@@ -22,13 +22,14 @@ import static org.junit.Assert.*;
 public class BankingMenuTest {
     private BankingMenu bankingMenu;
     private TestUtils testUtils;
-    private String testUserId = UUID.randomUUID().toString();
-    private String testEmail = "testuser@example.com";
-    private String testPassword = "password123";
-    private String testRole = "Customer";
+    private final String testUserId = UUID.randomUUID().toString();
+    private final String testEmail = "testuser@example.com";
+    private final String testPassword = "password123";
+    private final String testRole = "Customer";
 
     @Before
-    public void initialization() throws Exception {
+    public void initialization() throws Exception
+    {
         Scanner scanner = ScannerSingleton.getInstance();
         Connection connection = MyDatabase.getConnection();
         bankingMenu = new BankingMenu(scanner);
@@ -37,12 +38,27 @@ public class BankingMenuTest {
     }
 
     @After
-    public void tearDown() throws Exception {
-        testUtils.cleanupDatabase();
+    public void tearDown() throws Exception {testUtils.cleanupDatabase();}
+
+    @Test
+    public void testLogin_ValidCredentials() throws ExceptionHandler
+    {
+        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
+        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(in);
+
+        Scanner testScanner = new Scanner(System.in);
+        bankingMenu = new BankingMenu(testScanner);
+        bankingMenu.displayMenu();
+
+        assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
+
+        System.setIn(new ByteArrayInputStream(new byte[0]));
     }
 
     @Test
-    public void testLogin_InvalidCredentials() throws ExceptionHandler {
+    public void testLogin_InvalidCredentials() throws ExceptionHandler
+    {
         String invalidUser = "invalid@gmail.com";
         String simulatedInput = "1\n" + invalidUser + "\n" + testPassword + "\n0\n";
 
@@ -67,17 +83,7 @@ public class BankingMenuTest {
     }
 
     @Test
-    public void testLogin_ValidCredentials() throws ExceptionHandler {
-        String simulatedInput = "1\n" + testEmail + "\n" + testPassword + "\n0\n";
-        InputStream in = new ByteArrayInputStream(simulatedInput.getBytes());
-        System.setIn(in);
+    public void testCreateUser_ValidCredentials() {
 
-        Scanner testScanner = new Scanner(System.in);
-        bankingMenu = new BankingMenu(testScanner);
-        bankingMenu.displayMenu();
-
-        assertEquals(testEmail, bankingMenu.getLoggedInUser().getEmail());
-
-        System.setIn(new ByteArrayInputStream(new byte[0]));
     }
 }

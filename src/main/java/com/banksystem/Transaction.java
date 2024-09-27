@@ -12,8 +12,7 @@ public class Transaction {
     private String recipient;
 
     public Transaction(String transactionType,
-                       double amount, String sender, String recipient)
-    {
+                       double amount, String sender, String recipient) {
         this.transactionID = "tran-" + UUID.randomUUID().toString();
         this.transactionType = transactionType;
         this.amount = amount;

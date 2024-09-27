@@ -44,17 +44,31 @@ public class Account {
         recipient.deposit(amount);
     }
 
-    public String getAccountID() {return accountID;}
+    public String getAccountID() {
+        return accountID;
+    }
 
-    public void setAccountID(String accountID) {this.accountID = accountID;}
+    public void setAccountID(String accountID) {
+        this.accountID = accountID;
+    }
 
-    public double getBalance() {return balance;}
+    public double getBalance() {
+        return balance;
+    }
 
-    public void setBalance(double balance) {this.balance = balance;}
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 
-    public String getAccountType() {return accountType;}
+    public String getAccountType() {
+        return accountType;
+    }
 
-    public void setAccountType(String accountType) {this.accountType = accountType;}
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
 
-    public String getUserID() {return userID;}
+    public String getUserID() {
+        return userID;
+    }
 }

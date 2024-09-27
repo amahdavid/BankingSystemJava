@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class ScannerSingleton {
     private static Scanner instance;
+
     private ScannerSingleton() {}
 
     public static Scanner getInstance() {

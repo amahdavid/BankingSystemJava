@@ -8,6 +8,7 @@ public class CheckingAccount extends Account {
     public CheckingAccount(String userID, String accountType, double balance) {
         super(userID, accountType, balance);
     }
+
     public CheckingAccount(String accountID, double balance, String userID) {
         super(accountID, balance, userID, "Checking");
     }
