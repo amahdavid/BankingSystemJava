@@ -11,23 +11,22 @@ public class Transaction {
     private String sender;
     private String recipient;
 
-    public Transaction(String transactionType,
-                       double amount, String sender, String recipient) {
+    public Transaction(String transactionType, double amount, User sender, User recipient) {
         this.transactionID = "tran-" + UUID.randomUUID().toString();
         this.transactionType = transactionType;
         this.amount = amount;
-        this.sender = sender;
-        this.recipient = recipient;
+        this.sender = sender.getEmail();
+        this.recipient = (recipient != null) ? recipient.getEmail() : null;
         this.date = new Date();
     }
 
-    public Transaction(String transactionID, String transactionType, double amount, Date date, String sender, String recipient) {
+    public Transaction(String transactionID, String transactionType, double amount, Date date, User sender, User recipient) {
         this.transactionID = transactionID;
         this.transactionType = transactionType;
         this.amount = amount;
         this.date = date;
-        this.sender = sender;
-        this.recipient = recipient;
+        this.sender = sender.getEmail();
+        this.recipient = (recipient != null) ? recipient.getEmail() : null;
     }
 
     public boolean saveTransaction() {

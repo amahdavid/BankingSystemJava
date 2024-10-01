@@ -217,6 +217,8 @@ public class BankingMenu {
 
         if (isAccountCreated) {
             System.out.println("Account created successfully for " + loggedInUser.getEmail());
+            Transaction transaction = new Transaction("Deposit", balance, loggedInUser, null);
+            transaction.saveTransaction();
         } else {
             System.out.println("Failed to create account. Please try again.");
         }
@@ -253,7 +255,7 @@ public class BankingMenu {
             MyDatabase.updateAccountBalance(senderAccount, senderAccount.getBalance());
             MyDatabase.updateAccountBalance(recipientAccount, recipientAccount.getBalance());
             System.out.println("Transfer of " + amount + " to " + recipientEmail + " successful!");
-            Transaction transaction = new Transaction("Transfer", amount, senderAccount.getAccountID(), recipientAccount.getAccountID());
+            Transaction transaction = new Transaction("Transfer", amount, loggedInUser, recipient);
             transaction.saveTransaction();
         } catch (ExceptionHandler e) {
             System.out.println("Transfer failed: " + e.getMessage());
@@ -282,7 +284,7 @@ public class BankingMenu {
         userAccount.deposit(amount);
         MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
         System.out.println("Deposited " + amount + " successfully!");
-        Transaction transaction = new Transaction("Deposit", amount, userAccount.getAccountID(), null);
+        Transaction transaction = new Transaction("Deposit", amount, loggedInUser, null);
         transaction.saveTransaction();
     }
 
@@ -310,7 +312,7 @@ public class BankingMenu {
             userAccount.withdraw(amount);
             MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
             System.out.println("Withdrew " + amount + " successfully!");
-            Transaction transaction = new Transaction("Withdrawal", amount, userAccount.getAccountID(), null);
+            Transaction transaction = new Transaction("Withdrawal", amount, loggedInUser, null);
             transaction.saveTransaction();
         } catch (ExceptionHandler e) {
             System.out.println("Withdrawal failed: " + e.getMessage());
@@ -372,7 +374,10 @@ public class BankingMenu {
             System.out.println("No transactions found for this account.");
         } else {
             for (Transaction transaction : transactionHistory) {
-                System.out.println(transaction);
+                System.out.println("Trans Date: " + transaction.getDate()
+                        + ", Trans Type: " + transaction.getTransactionType()
+                        + ", Sender: " + transaction.getSender()
+                        + ", Recipient: " + transaction.getRecipient());
             }
         }
     }

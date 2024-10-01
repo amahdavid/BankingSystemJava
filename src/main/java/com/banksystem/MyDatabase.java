@@ -173,13 +173,38 @@ public class MyDatabase {
         }
     }
 
+    public static User getUserByAccountId(String accountId) {
+        User user = null;
+        String sql = "SELECT u.id, u.email, u.password, u.role FROM users u "
+                + "JOIN accounts a ON u.id = a.user_id WHERE a.account_id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, accountId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String userId = resultSet.getString("id");
+                    String email = resultSet.getString("email");
+                    String password = resultSet.getString("password");
+                    String role = resultSet.getString("role");
+
+                    user = new User(userId, email, password, role);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching user by account ID: " + e.getMessage());
+        }
+        return user;
+    }
+
     public static List<Transaction> getTransactionHistoryByAccount(String accountId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT transaction_id, transaction_type, amount, transaction_date, sender_account_id, recipient_account_id "
                 + "FROM transactions WHERE sender_account_id = ? OR recipient_account_id = ?";
 
         try (Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, accountId);
             statement.setString(2, accountId);
 
@@ -192,25 +217,28 @@ public class MyDatabase {
                     String senderAccountId = resultSet.getString("sender_account_id");
                     String recipientAccountId = resultSet.getString("recipient_account_id");
 
+                    // Fetch sender and recipient as Users
+                    User sender = MyDatabase.getUserByAccountId(senderAccountId);
+                    User recipient = (recipientAccountId != null) ? MyDatabase.getUserByAccountId(recipientAccountId) : null;
+
+                    // Create a transaction with User objects for sender and recipient
                     Transaction transaction = new Transaction(
                             transactionID,
                             transactionType,
                             amount,
                             transactionDate,
-                            senderAccountId,
-                            recipientAccountId
+                            sender,
+                            recipient
                     );
-                    transaction.setTransactionID(transactionID);
-                    transaction.setDate(transactionDate);
                     transactions.add(transaction);
                 }
             }
         } catch (SQLException e) {
             System.out.println("Error fetching transaction history: " + e.getMessage());
         }
-
         return transactions;
     }
+
 
     public static void main(String[] args) {
         Connection connection = getConnection();
