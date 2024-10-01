@@ -12,8 +12,6 @@ public class BankingMenu {
         this.scanner = scanner;
     }
 
-    // NEED TO IMPLEMENT TRANSACTION HISTORY
-    // ALSO NEED TO DECOUPLE THIS MENU
     public void displayMenu() throws ExceptionHandler {
         int choice;
         do {
@@ -150,6 +148,47 @@ public class BankingMenu {
 
         System.out.print("Press Enter to return to the main menu...");
         scanner.nextLine();
+    }
+
+    private void accountManagement() {
+        if (loggedInUser == null) {
+            System.out.println("Please log in first.");
+            return;
+        }
+        int choice;
+
+        do {
+            System.out.println("\n--- Account Management ---");
+            System.out.println("1. Create Account");
+            System.out.println("2. Delete Account");
+            System.out.println("3. Display All Accounts");
+            System.out.println("4. View Transaction History");
+            System.out.println("5. Return to main menu");
+            System.out.print("Please choose an option: ");
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    createAccount();
+                    break;
+                case 2:
+                    deleteAccount(); // might want to make this to only admins
+                    break;
+                case 3:
+                    displayAccounts();
+                    break;
+                case 4:
+                    displayTransactionHistory();
+                    break;
+                case 5:
+                    System.out.println("Returning to main menu...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 4);
     }
 
     private void createAccount() { // FUNCTIONAL
@@ -308,40 +347,8 @@ public class BankingMenu {
         }
     }
 
-    private void accountManagement() {
-        if (loggedInUser == null) {
-            System.out.println("Please log in first.");
-            return;
-        }
-        int choice;
-
-        do {
-            System.out.println("\n--- Account Management ---");
-            System.out.println("1. Create Account");
-            System.out.println("2. Delete Account");
-            System.out.println("3. Display All Accounts");
-            System.out.println("4. Return Main Menu");
-            System.out.print("Please choose an option: ");
-
-            choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    createAccount();
-                    break;
-                case 2:
-                    deleteAccount(); // might want to make this to only admins
-                    break;
-                case 3:
-                    displayAccounts();
-                    break;
-                case 4:
-                    System.out.println("Returning to main menu...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
-        } while (choice != 4);
+    private void displayTransactionHistory() {
+        // Should ask the user what account type history that they want, either checkings, business or savings
+        System.out.println("Not implemented");
     }
 }
