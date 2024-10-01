@@ -237,7 +237,6 @@ public class BankingMenu {
             System.out.println("Recipient not found");
             return;
         }
-
         System.out.print("Enter amount to transfer: ");
         double amount = scanner.nextDouble();
         scanner.nextLine();
@@ -254,6 +253,8 @@ public class BankingMenu {
             MyDatabase.updateAccountBalance(senderAccount, senderAccount.getBalance());
             MyDatabase.updateAccountBalance(recipientAccount, recipientAccount.getBalance());
             System.out.println("Transfer of " + amount + " to " + recipientEmail + " successful!");
+            Transaction transaction = new Transaction("Transfer", amount, senderAccount.getAccountID(), recipientAccount.getAccountID());
+            transaction.saveTransaction();
         } catch (ExceptionHandler e) {
             System.out.println("Transfer failed: " + e.getMessage());
         }
@@ -281,6 +282,8 @@ public class BankingMenu {
         userAccount.deposit(amount);
         MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
         System.out.println("Deposited " + amount + " successfully!");
+        Transaction transaction = new Transaction("Deposit", amount, userAccount.getAccountID(), null);
+        transaction.saveTransaction();
     }
 
     private void withdrawFunds() { // FUNCTIONAL
@@ -307,6 +310,8 @@ public class BankingMenu {
             userAccount.withdraw(amount);
             MyDatabase.updateAccountBalance(userAccount, userAccount.getBalance());
             System.out.println("Withdrew " + amount + " successfully!");
+            Transaction transaction = new Transaction("Withdrawal", amount, userAccount.getAccountID(), null);
+            transaction.saveTransaction();
         } catch (ExceptionHandler e) {
             System.out.println("Withdrawal failed: " + e.getMessage());
         }
@@ -348,7 +353,27 @@ public class BankingMenu {
     }
 
     private void displayTransactionHistory() {
-        // Should ask the user what account type history that they want, either checkings, business or savings
-        System.out.println("Not implemented");
+        if (loggedInUser == null) {
+            System.out.println("Please log in first.");
+            return;
+        }
+
+        System.out.print("Enter account type (Savings/Checking/Business): ");
+        String accountType = scanner.nextLine();
+
+        Account userAccount = MyDatabase.getAccountIdByUserAndType(loggedInUser, accountType);
+        if (userAccount == null) {
+            System.out.println("Account not found.");
+            return;
+        }
+
+        List<Transaction> transactionHistory = MyDatabase.getTransactionHistoryByAccount(userAccount.getAccountID());
+        if (transactionHistory.isEmpty()) {
+            System.out.println("No transactions found for this account.");
+        } else {
+            for (Transaction transaction : transactionHistory) {
+                System.out.println(transaction);
+            }
+        }
     }
 }

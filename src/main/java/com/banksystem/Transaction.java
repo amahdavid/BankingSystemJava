@@ -21,6 +21,43 @@ public class Transaction {
         this.date = new Date();
     }
 
+    public Transaction(String transactionID, String transactionType, double amount, Date date, String sender, String recipient) {
+        this.transactionID = transactionID;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.date = date;
+        this.sender = sender;
+        this.recipient = recipient;
+    }
+
+    public boolean saveTransaction() {
+        return MyDatabase.insertTransaction(this);
+    }
+
+    public void setTransactionID(String transactionID) {
+        this.transactionID = transactionID;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
+
     public String getTransactionID() {
         return transactionID;
     }

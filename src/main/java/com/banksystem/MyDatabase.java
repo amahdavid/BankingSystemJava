@@ -153,6 +153,64 @@ public class MyDatabase {
         }
     }
 
+    public static boolean insertTransaction(Transaction transaction) {
+        String sql = "INSERT INTO transactions (transaction_id, transaction_type, amount, transaction_date, sender_account_id, recipient_account_id) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, transaction.getTransactionID());
+            statement.setString(2, transaction.getTransactionType());
+            statement.setDouble(3, transaction.getAmount());
+            statement.setTimestamp(4, new java.sql.Timestamp(transaction.getDate().getTime()));
+            statement.setString(5, transaction.getSender());
+            statement.setString(6, transaction.getRecipient());
+
+            int rowsInserted = statement.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            System.out.println("Error inserting transaction: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static List<Transaction> getTransactionHistoryByAccount(String accountId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT transaction_id, transaction_type, amount, transaction_date, sender_account_id, recipient_account_id "
+                + "FROM transactions WHERE sender_account_id = ? OR recipient_account_id = ?";
+
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, accountId);
+            statement.setString(2, accountId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String transactionID = resultSet.getString("transaction_id");
+                    String transactionType = resultSet.getString("transaction_type");
+                    double amount = resultSet.getDouble("amount");
+                    Date transactionDate = resultSet.getDate("transaction_date");
+                    String senderAccountId = resultSet.getString("sender_account_id");
+                    String recipientAccountId = resultSet.getString("recipient_account_id");
+
+                    Transaction transaction = new Transaction(
+                            transactionID,
+                            transactionType,
+                            amount,
+                            transactionDate,
+                            senderAccountId,
+                            recipientAccountId
+                    );
+                    transaction.setTransactionID(transactionID);
+                    transaction.setDate(transactionDate);
+                    transactions.add(transaction);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching transaction history: " + e.getMessage());
+        }
+
+        return transactions;
+    }
 
     public static void main(String[] args) {
         Connection connection = getConnection();
